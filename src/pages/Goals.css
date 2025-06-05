@@ -1,0 +1,85 @@
+.goals-content {
+  --background: var(--cred-gradient-dark);
+}
+
+.goals-container {
+  padding: 16px;
+}
+
+.goals-section {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: white;
+  padding-left: 0;
+}
+
+.goal-item {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.goal-item:last-child {
+  border-bottom: none;
+}
+
+.goal-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.goal-header ion-icon {
+  font-size: 20px;
+  margin-right: 12px;
+  color: var(--ion-color-primary);
+}
+
+.goal-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.goal-progress {
+  margin-bottom: 16px;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+ion-progress-bar {
+  --progress-background: var(--ion-color-primary);
+  height: 8px;
+  border-radius: 4px;
+}
+
+.goal-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.goal-tags ion-chip {
+  margin: 0;
+  height: 24px;
+  font-size: 12px;
+  font-weight: 500;
+  --background: rgba(255, 255, 255, 0.1);
+  --color: rgba(255, 255, 255, 0.9);
+} 

@@ -1,0 +1,183 @@
+.profile-content {
+  --background: var(--cred-gradient-dark);
+}
+
+.profile-container {
+  padding: 16px;
+}
+
+.profile-header,
+.profile-settings {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: white;
+  padding-left: 0;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 16px;
+  background: var(--cred-gradient-primary);
+  border: 2px solid var(--glass-border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.profile-info h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: white;
+}
+
+.profile-info p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.profile-settings {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.setting-item {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.setting-header ion-icon {
+  font-size: 20px;
+  color: var(--ion-color-primary);
+  flex-shrink: 0;
+}
+
+.setting-content {
+  flex: 1;
+}
+
+.setting-content span {
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+}
+
+.setting-description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 4px 0 0 0;
+  font-weight: 400;
+}
+
+.setting-header ion-toggle {
+  flex-shrink: 0;
+}
+
+.logout-item .setting-header ion-icon {
+  color: var(--ion-color-danger);
+}
+
+.logout-item .setting-content span {
+  color: var(--ion-color-danger);
+}
+
+.logout-item {
+  /* No additional styles needed - handled by setting-item */
+}
+
+.logout-item ion-item {
+  --color: var(--ion-color-danger);
+}
+
+.logout-item ion-icon {
+  color: var(--ion-color-danger);
+}
+
+ion-toggle {
+  --background: rgba(255, 255, 255, 0.2);
+  --background-checked: var(--ion-color-primary);
+  --handle-background: var(--ion-color-light);
+  --handle-background-checked: var(--ion-color-light);
+}
+
+.theme-selector-container {
+  flex-shrink: 0;
+  min-width: 120px;
+}
+
+.theme-select {
+  --background: rgba(255, 255, 255, 0.1);
+  --color: white;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  min-width: 120px;
+}
+
+.theme-option-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-option-content ion-icon {
+  font-size: 16px;
+  color: var(--ion-color-primary);
+}
+
+.theme-option-content span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Light theme overrides */
+.light-theme .setting-content span {
+  color: var(--text-primary) !important;
+}
+
+.light-theme .setting-description {
+  color: var(--text-secondary) !important;
+}
+
+.light-theme .theme-select {
+  --background: rgba(0, 0, 0, 0.05);
+  --color: var(--text-primary);
+} 

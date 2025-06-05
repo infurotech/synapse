@@ -1,2 +1,366 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
+
+/* CRED-Inspired Modern Theme System */
+
+/* Dark Theme (Default) - Inspired by CRED's premium dark aesthetic */
+:root {
+  /* Primary Brand Colors */
+  --ion-color-primary: #6C5CE7;
+  --ion-color-primary-rgb: 108, 92, 231;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #5F52CC;
+  --ion-color-primary-tint: #7B6AEA;
+
+  /* Secondary Colors */
+  --ion-color-secondary: #00CEC9;
+  --ion-color-secondary-rgb: 0, 206, 201;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #00B5B1;
+  --ion-color-secondary-tint: #1AD3CE;
+
+  /* Success */
+  --ion-color-success: #00B894;
+  --ion-color-success-rgb: 0, 184, 148;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #00A085;
+  --ion-color-success-tint: #1AC29F;
+
+  /* Warning */
+  --ion-color-warning: #FDCB6E;
+  --ion-color-warning-rgb: 253, 203, 110;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #DEB361;
+  --ion-color-warning-tint: #FDD17D;
+
+  /* Danger */
+  --ion-color-danger: #E17055;
+  --ion-color-danger-rgb: 225, 112, 85;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #C6634B;
+  --ion-color-danger-tint: #E47F66;
+
+  /* Dark Theme Colors */
+  --ion-color-dark: #0D1421;
+  --ion-color-dark-rgb: 13, 20, 33;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #0B121D;
+  --ion-color-dark-tint: #252A37;
+
+  /* Medium */
+  --ion-color-medium: #74B9FF;
+  --ion-color-medium-rgb: 116, 185, 255;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #66A3E0;
+  --ion-color-medium-tint: #82C4FF;
+
+  /* Light */
+  --ion-color-light: #F8F9FA;
+  --ion-color-light-rgb: 248, 249, 250;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade: #DADBDC;
+  --ion-color-light-tint: #F9FAFB;
+
+  /* Dark Theme Background Colors */
+  --ion-background-color: #0D1421;
+  --ion-background-color-rgb: 13, 20, 33;
+  --ion-text-color: #ffffff;
+  --ion-text-color-rgb: 255, 255, 255;
+
+  /* Dark Theme Gradients */
+  --cred-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --cred-gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --cred-gradient-dark: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 100%);
+  --cred-gradient-card: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+  
+  /* Dark Theme Glass Morphism */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-backdrop: blur(20px);
+
+  /* Dark Theme Shadows */
+  --shadow-soft: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --shadow-card: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+  --shadow-button: 0 4px 15px 0 rgba(108, 92, 231, 0.35);
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  /* Theme transition */
+  --theme-transition: all 0.3s ease;
+}
+
+/* Light Theme Variables */
+.light-theme {
+  /* Light Theme Background Colors */
+  --ion-background-color: #F8F9FA;
+  --ion-background-color-rgb: 248, 249, 250;
+  --ion-text-color: #2C3E50;
+  --ion-text-color-rgb: 44, 62, 80;
+
+  /* Light Theme Warning Override */
+  --ion-color-warning: #F39C12;
+  --ion-color-warning-rgb: 243, 156, 18;
+  --ion-color-danger: #E74C3C;
+  --ion-color-danger-rgb: 231, 76, 60;
+
+  /* Light Theme Gradients */
+  --cred-gradient-dark: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  --cred-gradient-card: linear-gradient(135deg, #ffffff 0%, #f1f3f4 100%);
+  
+  /* Light Theme Glass Morphism */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-backdrop: blur(20px);
+
+  /* Light Theme Shadows */
+  --shadow-soft: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 4px 16px 0 rgba(0, 0, 0, 0.08);
+  --shadow-button: 0 4px 15px 0 rgba(108, 92, 231, 0.25);
+}
+
+/* Global Styling with Theme Support */
+html, body {
+  background: var(--cred-gradient-dark);
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: var(--theme-transition);
+}
+
+ion-content {
+  --background: transparent;
+}
+
+/* Enhanced Theme-Aware Components */
+.cred-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  margin: 16px;
+  padding: 20px;
+  transition: var(--theme-transition);
+}
+
+.cred-button {
+  --background: var(--cred-gradient-primary);
+  --border-radius: var(--radius-md);
+  --box-shadow: var(--shadow-button);
+  --color: white;
+  font-weight: 600;
+  text-transform: none;
+  height: 48px;
+  margin: 8px 0;
+  transition: var(--theme-transition);
+}
+
+.cred-button:hover {
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Theme-Aware Biometric Button */
+.biometric-button {
+  --background: transparent;
+  --border-radius: 50%;
+  --box-shadow: var(--shadow-soft);
+  width: 80px;
+  height: 80px;
+  border: 2px solid var(--glass-border);
+  backdrop-filter: var(--glass-backdrop);
+  transition: var(--theme-transition);
+}
+
+/* Theme-Aware Tab Bar */
+ion-tab-bar {
+  --background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border-top: 1px solid var(--glass-border);
+  height: 80px;
+  transition: var(--theme-transition);
+}
+
+ion-tab-button {
+  --color: var(--ion-text-color);
+  --color-selected: var(--ion-color-primary);
+  transition: var(--theme-transition);
+}
+
+/* Light theme specific tab button colors */
+.light-theme ion-tab-button {
+  --color: rgba(44, 62, 80, 0.6);
+}
+
+/* Theme-Aware Input Styling */
+ion-input {
+  --background: var(--glass-bg);
+  --border-radius: var(--radius-md);
+  --color: var(--ion-text-color);
+  --placeholder-color: var(--ion-text-color);
+  border: 1px solid var(--glass-border);
+  margin: 8px 0;
+  transition: var(--theme-transition);
+}
+
+/* Light theme input placeholder */
+.light-theme ion-input {
+  --placeholder-color: rgba(44, 62, 80, 0.6);
+}
+
+/* Theme-Aware Header Styling */
+ion-header {
+  --background: transparent;
+  --border-color: var(--glass-border);
+  transition: var(--theme-transition);
+}
+
+ion-toolbar {
+  --background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  --color: var(--ion-text-color);
+  transition: var(--theme-transition);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  --color: var(--ion-color-primary);
+}
+
+/* Enhanced Animation Classes */
+.fade-in {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+.theme-transition {
+  transition: var(--theme-transition);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* Theme Toggle Component Styles */
+.theme-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  transition: var(--theme-transition);
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--theme-transition);
+  color: var(--ion-text-color);
+}
+
+.theme-option.active {
+  background: var(--ion-color-primary);
+  color: white;
+}
+
+.theme-option:hover:not(.active) {
+  background: var(--glass-bg);
+}
+
+/* Light Theme Text Colors */
+.light-theme .theme-option {
+  color: var(--ion-text-color);
+}
+
+/* Enhanced Toggle Styles */
+ion-toggle {
+  --background: var(--glass-bg);
+  --background-checked: var(--ion-color-primary);
+  --handle-background: var(--ion-color-light);
+  --handle-background-checked: var(--ion-color-light);
+  transition: var(--theme-transition);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cred-card {
+    margin: 12px;
+    padding: 16px;
+  }
+  
+  .theme-selector {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .theme-option {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Additional Light Theme Overrides */
+.light-theme {
+  /* Text color overrides for better contrast in light mode */
+  --text-primary: #2C3E50;
+  --text-secondary: rgba(44, 62, 80, 0.7);
+  --text-muted: rgba(44, 62, 80, 0.5);
+}
+
+.light-theme .section-title,
+.light-theme h1, 
+.light-theme h2, 
+.light-theme h3 {
+  color: var(--text-primary) !important;
+}
+
+.light-theme .greeting-text-top {
+  background: var(--cred-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* System Theme Media Query Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+  }
+}

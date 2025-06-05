@@ -1,0 +1,70 @@
+.tasks-content {
+  --background: var(--cred-gradient-dark);
+}
+
+.tasks-container {
+  padding: 16px;
+}
+
+.tasks-section {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: white;
+  padding-left: 0;
+}
+
+.task-item {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.task-header ion-icon {
+  font-size: 20px;
+  color: var(--ion-color-primary);
+  flex-shrink: 0;
+}
+
+.task-content {
+  flex: 1;
+}
+
+.task-content h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: white;
+}
+
+.task-content p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.task-header ion-badge {
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+} 

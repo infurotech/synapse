@@ -1,0 +1,344 @@
+/* Splash Screen Styles */
+.splash-content {
+  --background: var(--cred-gradient-dark);
+  position: relative;
+  overflow: hidden;
+}
+
+.splash-container {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  z-index: 2;
+}
+
+/* Background Elements */
+.splash-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.floating-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(45deg, rgba(108, 92, 231, 0.25), rgba(139, 69, 193, 0.15));
+  filter: blur(40px);
+  animation: float 6s ease-in-out infinite;
+}
+
+.orb-1 {
+  width: 200px;
+  height: 200px;
+  top: 10%;
+  left: -10%;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 150px;
+  height: 150px;
+  top: 60%;
+  right: -5%;
+  animation-delay: 2s;
+}
+
+.orb-3 {
+  width: 100px;
+  height: 100px;
+  bottom: 20%;
+  left: 20%;
+  animation-delay: 4s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-30px) rotate(10deg);
+  }
+}
+
+/* Neural Network Background */
+.neural-network {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.08;
+}
+
+.neural-dot {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--ion-color-primary);
+  border-radius: 50%;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.neural-dot:nth-child(odd) {
+  animation-delay: 1s;
+}
+
+.neural-dot:nth-child(even) {
+  animation-delay: 2s;
+}
+
+/* Positioning neural dots */
+.dot-0 { top: 10%; left: 20%; }
+.dot-1 { top: 15%; left: 80%; }
+.dot-2 { top: 25%; left: 60%; }
+.dot-3 { top: 35%; left: 30%; }
+.dot-4 { top: 45%; left: 90%; }
+.dot-5 { top: 55%; left: 10%; }
+.dot-6 { top: 65%; left: 70%; }
+.dot-7 { top: 75%; left: 40%; }
+.dot-8 { top: 85%; left: 85%; }
+.dot-9 { top: 20%; left: 50%; }
+.dot-10 { top: 40%; left: 75%; }
+.dot-11 { top: 60%; left: 25%; }
+.dot-12 { top: 80%; left: 60%; }
+.dot-13 { top: 30%; left: 15%; }
+.dot-14 { top: 70%; left: 95%; }
+.dot-15 { top: 50%; left: 45%; }
+.dot-16 { top: 90%; left: 20%; }
+.dot-17 { top: 5%; left: 70%; }
+.dot-18 { top: 95%; left: 50%; }
+.dot-19 { top: 12%; left: 35%; }
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+}
+
+/* Main Content */
+.splash-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 3;
+}
+
+/* Logo Styles */
+.splash-logo-container {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.splash-logo {
+  width: 120px;
+  height: 120px;
+  filter: drop-shadow(0 0 20px rgba(108, 92, 231, 0.4));
+  z-index: 2;
+  position: relative;
+}
+
+.logo-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  border: 2px solid rgba(108, 92, 231, 0.4);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+/* Title Styles */
+.splash-title-container {
+  margin-bottom: 3rem;
+}
+
+.splash-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--ion-text-color);
+  margin: 0 0 0.5rem 0;
+  background: var(--cred-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  letter-spacing: -0.02em;
+}
+
+.splash-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+/* Loading Styles */
+.splash-loading {
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 2rem;
+}
+
+.loading-text {
+  height: 24px;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-text span {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.loading-bar {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.loading-progress {
+  height: 100%;
+  background: var(--cred-gradient-primary);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(108, 92, 231, 0.4);
+}
+
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loading-dot {
+  width: 8px;
+  height: 8px;
+  background: rgba(108, 92, 231, 0.8);
+  border-radius: 50%;
+}
+
+/* Footer Styles */
+.splash-footer {
+  position: absolute;
+  bottom: 2rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.splash-footer p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.version-info {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 300;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .splash-container {
+    padding: 1rem;
+  }
+  
+  .splash-logo {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .logo-pulse {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .splash-title {
+    font-size: 2.5rem;
+  }
+  
+  .splash-subtitle {
+    font-size: 1rem;
+  }
+  
+  .loading-text span {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .splash-title {
+    font-size: 2.2rem;
+  }
+  
+  .splash-logo {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .logo-pulse {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* Light Theme Support */
+.light-theme .splash-content {
+  --background: var(--cred-gradient-dark);
+}
+
+.light-theme .splash-title {
+  color: var(--ion-text-color);
+  background: var(--cred-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.light-theme .splash-subtitle {
+  color: rgba(44, 62, 80, 0.8);
+}
+
+.light-theme .loading-text span {
+  color: rgba(44, 62, 80, 0.9);
+}
+
+.light-theme .splash-footer {
+  color: rgba(44, 62, 80, 0.6);
+}
+
+.light-theme .version-info {
+  color: rgba(44, 62, 80, 0.4);
+}
+
+.light-theme .loading-bar {
+  background: rgba(44, 62, 80, 0.1);
+}
+
+.light-theme .floating-orb {
+  background: linear-gradient(45deg, rgba(108, 92, 231, 0.15), rgba(139, 69, 193, 0.1));
+}
+
+.light-theme .neural-dot {
+  background: var(--ion-color-primary);
+} 

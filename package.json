@@ -1,7 +1,7 @@
 {
-  "name": "agent-app",
+  "name": "synapse",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -19,9 +19,12 @@
     "@capacitor/status-bar": "7.0.1",
     "@ionic/react": "^8.5.0",
     "@ionic/react-router": "^8.5.0",
+    "@types/node": "^22.15.29",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
+    "framer-motion": "^12.16.0",
     "ionicons": "^7.4.0",
+    "lucide-react": "^0.513.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-router": "^5.3.4",
@@ -50,5 +53,5 @@
     "vite": "~5.2.0",
     "vitest": "^0.34.6"
   },
-  "description": "An Ionic project"
+  "description": "AI-Powered Personal Assistant That Lives in Your Pocket"
 }

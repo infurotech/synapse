@@ -1,0 +1,411 @@
+.login-content {
+  --background: var(--cred-gradient-dark);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Main Content Wrapper */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+/* Geometric Elements */
+.geometric-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.geometric-circle {
+  position: absolute;
+  border: 1px solid rgba(108, 92, 231, 0.15);
+  border-radius: 50%;
+  background: rgba(108, 92, 231, 0.02);
+}
+
+.circle-1 {
+  width: 90px;
+  height: 90px;
+  top: 20%;
+  right: 10%;
+}
+
+.circle-2 {
+  width: 70px;
+  height: 70px;
+  bottom: 25%;
+  left: 15%;
+}
+
+/* Header Section */
+.login-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.app-logo {
+  margin-bottom: 30px;
+}
+
+.logo-circle {
+  width: 100px;
+  height: 100px;
+  background: var(--cred-gradient-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: var(--shadow-button);
+  backdrop-filter: var(--glass-backdrop);
+  position: relative;
+  overflow: visible;
+}
+
+.logo-circle::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border-radius: 50%;
+  background: var(--cred-gradient-primary);
+  opacity: 0.1;
+  z-index: -1;
+  animation: logoGlow 3s ease-in-out infinite alternate;
+}
+
+.logo-icon {
+  font-size: 50px;
+  color: white;
+}
+
+.app-title {
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  background: var(--cred-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+.app-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Biometric Section */
+.biometric-section {
+  width: 100%;
+  max-width: 380px;
+  margin-bottom: 60px;
+}
+
+.biometric-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  margin: 0;
+  position: relative;
+  overflow: visible;
+}
+
+.biometric-content {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.biometric-icon-container {
+  margin-bottom: 25px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.biometric-button {
+  --background: transparent;
+  --border-radius: 50%;
+  --box-shadow: var(--shadow-soft);
+  --border-width: 0;
+  --border-style: none;
+  --border-color: transparent;
+  --outline: none;
+  --outline-width: 0;
+  --outline-style: none;
+  --outline-color: transparent;
+  --ripple-color: transparent;
+  width: 120px;
+  height: 120px;
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  outline: none;
+  position: relative;
+  overflow: visible;
+  z-index: 2;
+}
+
+.biometric-button:focus {
+  outline: none !important;
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  --border-width: 0 !important;
+  --outline: none !important;
+}
+
+.biometric-button::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 50%;
+  background: var(--cred-gradient-primary);
+  z-index: -1;
+  opacity: 0.15;
+  animation: pulse 4s infinite;
+}
+
+.ripple-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  background: rgba(108, 92, 231, 0.025);
+}
+
+.biometric-icon {
+  font-size: 60px;
+  color: var(--ion-color-primary);
+}
+
+.biometric-text h3 {
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.biometric-text p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Footer Section */
+.login-footer {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.footer-text p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  margin: 0 0 8px 0;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+
+.version-text {
+  color: rgba(255, 255, 255, 0.4) !important;
+  font-size: 0.8rem !important;
+  font-weight: 300 !important;
+  margin: 0 !important;
+}
+
+/* Background Elements */
+.background-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.floating-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--cred-gradient-primary);
+  opacity: 0.03;
+  filter: blur(80px);
+}
+
+.orb-1 {
+  width: 250px;
+  height: 250px;
+  top: 5%;
+  right: -100px;
+}
+
+.orb-2 {
+  width: 200px;
+  height: 200px;
+  bottom: 10%;
+  left: -140px;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.05;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.15;
+  }
+}
+
+@keyframes logoGlow {
+  0% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scale(1.05);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .login-container {
+    padding: 20px 15px;
+  }
+  
+  .login-header {
+    margin-bottom: 50px;
+  }
+  
+  .app-logo {
+    margin-bottom: 25px;
+  }
+  
+  .logo-circle {
+    width: 85px;
+    height: 85px;
+  }
+  
+  .logo-icon {
+    font-size: 42px;
+  }
+  
+  .app-title {
+    font-size: 2.8rem;
+  }
+  
+  .biometric-section {
+    margin-bottom: 50px;
+  }
+  
+  .biometric-content {
+    padding: 35px 20px;
+  }
+  
+  .biometric-button, .ripple-effect {
+    width: 110px;
+    height: 110px;
+  }
+  
+  .biometric-icon {
+    font-size: 55px;
+  }
+  
+  .circle-1 {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .circle-2 {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .orb-1, .orb-2 {
+    opacity: 0.015;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 20px 10px;
+  }
+  
+  .app-title {
+    font-size: 2.4rem;
+  }
+  
+  .biometric-content {
+    padding: 30px 15px;
+  }
+  
+  .biometric-button, .ripple-effect {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .biometric-icon {
+    font-size: 50px;
+  }
+  
+  .logo-circle {
+    width: 75px;
+    height: 75px;
+  }
+  
+  .logo-icon {
+    font-size: 38px;
+  }
+  
+  .footer-text p {
+    font-size: 0.85rem;
+  }
+  
+  .version-text {
+    font-size: 0.75rem !important;
+  }
+} 
