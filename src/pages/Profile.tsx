@@ -10,17 +10,11 @@ import {
   IonCard,
   IonCardContent,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonAvatar,
-  IonList,
   IonToggle,
-  IonSelect,
-  IonSelectOption,
+  IonRouterLink,
 } from '@ionic/react';
 import {
   personOutline,
-  mailOutline,
   notificationsOutline,
   moonOutline,
   sunnyOutline,
@@ -28,13 +22,13 @@ import {
   lockClosedOutline,
   helpCircleOutline,
   logOutOutline,
-  colorPaletteOutline,
+  bulbOutline,
 } from 'ionicons/icons';
 import { useTheme } from '../contexts/ThemeContext';
 import './Profile.css';
 
 const Profile: React.FC = () => {
-  const { themeMode, setThemeMode, toggleTheme, currentTheme } = useTheme();
+  const { toggleTheme, currentTheme } = useTheme();
 
   const getThemeIcon = (mode: string) => {
     switch (mode) {
@@ -42,15 +36,6 @@ const Profile: React.FC = () => {
       case 'dark': return moonOutline;
       case 'system': return phonePortraitOutline;
       default: return moonOutline;
-    }
-  };
-
-  const getThemeLabel = (mode: string) => {
-    switch (mode) {
-      case 'light': return 'Light Mode';
-      case 'dark': return 'Dark Mode';
-      case 'system': return 'System Theme';
-      default: return 'Dark Mode';
     }
   };
 
@@ -130,6 +115,17 @@ const Profile: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              <IonRouterLink routerLink="/ai-debug">
+                <div className="setting-item">
+                  <div className="setting-header">
+                    <IonIcon icon={bulbOutline} />
+                    <div className="setting-content">
+                      <span>AI Assistant Debug</span>
+                    </div>
+                  </div>
+                </div>
+              </IonRouterLink>
               
               <div className="setting-item logout-item">
                 <div className="setting-header">
