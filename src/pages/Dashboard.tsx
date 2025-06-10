@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   IonContent,
   IonPage,
@@ -35,16 +35,46 @@ import {
   flagOutline,
 } from 'ionicons/icons';
 import { motion } from 'framer-motion';
+import { isPlatform } from '@ionic/react';
+import { Keyboard } from '@capacitor/keyboard';
+import { SpeechRecognition } from '@capacitor-community/speech-recognition';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 import './Dashboard.css';
+
+interface Message {
+  type: 'user' | 'ai';
+  content: string;
+}
+
+interface Conversation {
+  id: number;
+  title: string;
+  preview: string;
+  time: string;
+}
+
+interface AttachedFile {
+  name: string;
+  path: string;
+  type: string;
+  size?: number;
+  preview?: string;
+}
 
 const Dashboard: React.FC = () => {
   const [greeting, setGreeting] = useState('');
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [chatMessage, setChatMessage] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
   const [isFullPageChat, setIsFullPageChat] = useState(false);
   const [showHistoryPopover, setShowHistoryPopover] = useState(false);
-  const [conversations, setConversations] = useState([
+  const [isCompanyApplicationFlow, setIsCompanyApplicationFlow] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [chatMessage, setChatMessage] = useState('');
+  const [attachedFile, setAttachedFile] = useState<AttachedFile | null>(null);
+
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [conversations] = useState<Conversation[]>([
     { id: 1, title: 'Meeting preparation tips', preview: 'Can you help me prepare for tomorrow\'s...', time: '2h ago' },
     { id: 2, title: 'Travel itinerary planning', preview: 'I need help planning my trip to...', time: '1d ago' },
     { id: 3, title: 'Project deadline management', preview: 'How can I better manage my project...', time: '3d ago' },
@@ -56,7 +86,10 @@ const Dashboard: React.FC = () => {
     { id: 2, text: 'Review upcoming tasks', icon: clipboardOutline },
     { id: 3, text: 'Give me insights', icon: bulbOutline },
     { id: 4, text: 'What should I focus on?', icon: sparklesOutline },
+    { id: 5, text: 'Apply to a company', icon: flagOutline },
   ]);
+
+  const inputRef = useRef<HTMLIonTextareaElement>(null);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -68,6 +101,22 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    if (isPlatform('android') || isPlatform('ios')) {
+      const showSub = Keyboard.addListener('keyboardWillShow', () => {
+        setKeyboardOpen(true);
+      });
+      const hideSub = Keyboard.addListener('keyboardWillHide', () => {
+        setKeyboardOpen(false);
+      });
+  
+      return () => {
+        showSub.then(sub => sub.remove());
+        hideSub.then(sub => sub.remove());
+      };
+    }
+  }, []);
+
   const upcomingEvents = [
     { id: 1, title: 'Team Meeting', time: '10:00 AM', urgent: true },
     { id: 2, title: 'Lunch with Sarah', time: '1:00 PM', urgent: false },
@@ -75,35 +124,161 @@ const Dashboard: React.FC = () => {
   ];
 
   const handleSendMessage = () => {
-    if (chatMessage.trim()) {
-      // Expand to full page chat like ChatGPT
-      setIsFullPageChat(true);
-      // Here you would integrate with OpenAI API
-      console.log('Sending message:', chatMessage);
+    if (chatMessage.trim() || attachedFile) {
+      const userMessage = chatMessage.trim();
+      setMessages(prev => [...prev, { type: 'user', content: userMessage }]);
+      
+      if (attachedFile) {
+        setMessages(prev => [
+          ...prev,
+          { type: 'user', content: `Sent a file: ${attachedFile.name}` }
+        ]);
+        setAttachedFile(null);
+      }
+      
+      if (isCompanyApplicationFlow) {
+        const task = {
+          id: Date.now().toString(),
+          title: `Apply to ${userMessage}`,
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          priority: 'High',
+          status: 'pending',
+          type: 'company_application'
+        };
+        
+        const savedTasks = localStorage.getItem('tasks');
+        const tasks = savedTasks ? JSON.parse(savedTasks) : [];
+        tasks.push(task);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        
+        setMessages(prev => [...prev, { 
+          type: 'ai', 
+          content: `I've created a task for applying to ${userMessage}. Good luck with your application!` 
+        }]);
+        
+        setIsCompanyApplicationFlow(false);
+      } else if (userMessage === 'Apply to a company') {
+        setIsCompanyApplicationFlow(true);
+        setMessages(prev => [...prev, { 
+          type: 'ai', 
+          content: 'Okay, so what company are you focusing upon?' 
+        }]);
+      }
+      
       setChatMessage('');
     }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
-    setChatMessage(suggestion);
+    setChatMessage('');
+    setIsFullPageChat(true);
+    if (suggestion === 'Apply to a company') {
+      setIsCompanyApplicationFlow(true);
+      setMessages([{ 
+        type: 'ai', 
+        content: 'Okay, so what company are you focusing upon?' 
+      }]);
+    }
   };
 
-  const handleVoiceRecord = () => {
-    setIsRecording(!isRecording);
-    // Here you would implement voice recording functionality
+  const handleVoiceRecord = async () => {
+    if (!isPlatform('android') && !isPlatform('ios')) {
+      alert('Speech recognition is only available on mobile devices.');
+      return;
+    }
+
+    if (!isRecording) {
+      setIsRecording(true);
+
+      const perm = await SpeechRecognition.requestPermissions();
+      if (perm.speechRecognition !== 'granted') {
+        alert('Microphone permission is required for speech recognition.');
+        setIsRecording(false);
+        return;
+      }
+
+      try {
+        const result = await SpeechRecognition.start({
+          language: 'en-US',
+          maxResults: 1,
+          prompt: 'Speak now',
+          partialResults: false,
+          popup: true,
+        });
+
+        if (result.matches && result.matches.length > 0) {
+          setChatMessage(result.matches[0]);
+        } else {
+          alert('No speech detected. Please try again.');
+        }
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        alert('Speech recognition error: ' + errorMessage);
+      }
+      setIsRecording(false);
+    } else {
+      setIsRecording(false);
+      await SpeechRecognition.stop();
+    }
   };
 
-  const handleFileUpload = () => {
-    // Here you would implement file upload functionality
-    console.log('File upload clicked');
+  const handleFileUpload = async () => {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Photos
+      });
+
+      if (image.webPath) {
+        const fileName = image.webPath.split('/').pop() || 'file';
+        const fileType = fileName.split('.').pop()?.toLowerCase() || '';
+        
+        let preview = '';
+        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+          preview = image.webPath;
+        } else {
+          preview = getFileTypeIcon(fileType);
+        }
+
+        setAttachedFile({ 
+          name: fileName,
+          path: image.webPath,
+          type: fileType,
+          preview
+        });
+      }
+    } catch (err) {
+      console.error('Error picking file:', err);
+    }
+  };
+
+  const getFileTypeIcon = (fileType: string): string => {
+    switch (fileType) {
+      case 'pdf':
+        return '📄';
+      case 'doc':
+      case 'docx':
+        return '📝';
+      case 'xls':
+      case 'xlsx':
+        return '📊';
+      case 'txt':
+        return '📃';
+      case 'zip':
+      case 'rar':
+        return '📦';
+      default:
+        return '📎';
+    }
   };
 
   const handleHistoryClick = () => {
     setShowHistoryPopover(true);
   };
 
-  const handleConversationSelect = (conversation: any) => {
-    // Load the selected conversation
+  const handleConversationSelect = (conversation: Conversation) => {
     console.log('Loading conversation:', conversation.title);
     setShowHistoryPopover(false);
     setIsFullPageChat(true);
@@ -113,10 +288,21 @@ const Dashboard: React.FC = () => {
     setIsFullPageChat(false);
   };
 
+  const handleInputFocus = () => {
+    setKeyboardOpen(true);
+    if (!(isPlatform('android') || isPlatform('ios'))) {
+      setTimeout(() => {
+        inputRef.current?.getInputElement().then((el) => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }, 200);
+    }
+  };
+
   if (isFullPageChat) {
     return (
       <IonPage>
-        <IonContent fullscreen className="fullpage-chat-content">
+        <IonContent className="fullpage-chat-content">
           <div className="fullpage-chat-container">
             <div className="fullpage-header">
               <IonButton 
@@ -132,28 +318,55 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             
-            <div className="fullpage-messages">
-              {/* Chat messages would go here */}
-              <div className="message-container">
-                <div className="user-message">
-                  <p>Hello, how can I help you today?</p>
+            <div className="fullpage-messages-scrollable">
+              {messages.map((message, index) => (
+                <div key={index} className={`message-container ${message.type}`}>
+                  <div className={`${message.type}-message`}>
+                    <p>{message.content}</p>
+                  </div>
                 </div>
-                <div className="ai-message">
-                  <p>I'm here to assist you with any questions or tasks you have. What would you like to work on?</p>
-                </div>
-              </div>
+              ))}
             </div>
             
-            <div className="fullpage-input-section">
+            <div className={`fullpage-input-section ${keyboardOpen ? 'keyboard-open' : ''}`}>
               <div className="fullpage-chat-input">
                 <IonTextarea
-                  value={chatMessage}
-                  onIonInput={(e) => setChatMessage(e.detail.value!)}
+                   ref={inputRef}
+                   onFocus={() => {
+                     setKeyboardOpen(true);
+                     setTimeout(() => {
+                       inputRef.current?.getInputElement().then((el) => {
+                         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                       });
+                     }, 300);
+                   }}
+                   value={chatMessage}
+                   onIonInput={(e) => setChatMessage(e.detail.value!)}
                   placeholder="Message Nexus..."
                   rows={1}
                   autoGrow={true}
                   className="fullpage-textarea"
                 />
+                {attachedFile && (
+                  <div className="attached-file-chip">
+                    {attachedFile.preview && (
+                      <div className="file-preview">
+                        {attachedFile.preview.startsWith('data:') || attachedFile.preview.startsWith('http') ? (
+                          <img src={attachedFile.preview} alt={attachedFile.name} />
+                        ) : (
+                          <span className="file-icon">{attachedFile.preview}</span>
+                        )}
+                      </div>
+                    )}
+                    <div className="file-info">
+                      <span className="file-name">{attachedFile.name}</span>
+                      <span className="file-type">{attachedFile.type.toUpperCase()}</span>
+                    </div>
+                    <IonButton fill="clear" size="small" onClick={() => setAttachedFile(null)}>
+                      Remove
+                    </IonButton>
+                  </div>
+                )}
                 <div className="fullpage-actions">
                   <IonButton
                     fill="clear"
@@ -190,9 +403,8 @@ const Dashboard: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className="dashboard-content">
+      <IonContent className="dashboard-content">
         <div className="dashboard-container">
-          {/* Enhanced Greeting Section - Bigger without time */}
           <motion.div
             className="greeting-section-top"
             initial={{ opacity: 0, y: -30 }}
@@ -231,7 +443,6 @@ const Dashboard: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Four Icons Row */}
           <motion.div
             className="quick-icons-section"
             initial={{ opacity: 0, y: 20 }}
@@ -266,7 +477,6 @@ const Dashboard: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Quick Events List - Clean and Minimal */}
           {upcomingEvents.length > 0 && (
             <motion.div
               className="quick-events-section"
@@ -296,10 +506,8 @@ const Dashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Sticky Chat at Footer */}
         <div className="chat-footer-sticky">
           <div className="chat-center-container">
-            {/* AI Suggestions */}
             <div className="ai-suggestions">
               {suggestions.map((suggestion) => (
                 <motion.div
@@ -370,7 +578,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* History Popover */}
         <IonPopover
           isOpen={showHistoryPopover}
           onDidDismiss={() => setShowHistoryPopover(false)}
