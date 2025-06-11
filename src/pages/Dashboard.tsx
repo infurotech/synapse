@@ -13,24 +13,17 @@ import {
   IonAvatar,
   IonTextarea,
   IonPopover,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
 } from '@ionic/react';
 import {
   micOutline,
   sendOutline,
-  attachOutline,
   personOutline,
-  flash,
   timeOutline,
   chevronForwardOutline,
-  chatbubbleOutline,
   sparklesOutline,
   calendarOutline,
   clipboardOutline,
   bulbOutline,
-  timeSharp,
   checkboxOutline,
   flagOutline,
 } from 'ionicons/icons';
@@ -38,8 +31,6 @@ import { motion } from 'framer-motion';
 import { isPlatform } from '@ionic/react';
 import { Keyboard } from '@capacitor/keyboard';
 import { SpeechRecognition } from '@capacitor-community/speech-recognition';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { Filesystem, Directory } from '@capacitor/filesystem';
 import './Dashboard.css';
 
 interface Message {
@@ -54,14 +45,6 @@ interface Conversation {
   time: string;
 }
 
-interface AttachedFile {
-  name: string;
-  path: string;
-  type: string;
-  size?: number;
-  preview?: string;
-}
-
 const Dashboard: React.FC = () => {
   const [greeting, setGreeting] = useState('');
   const [keyboardOpen, setKeyboardOpen] = useState(false);
@@ -71,7 +54,6 @@ const Dashboard: React.FC = () => {
   const [isCompanyApplicationFlow, setIsCompanyApplicationFlow] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
-  const [attachedFile, setAttachedFile] = useState<AttachedFile | null>(null);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversations] = useState<Conversation[]>([
@@ -124,17 +106,9 @@ const Dashboard: React.FC = () => {
   ];
 
   const handleSendMessage = () => {
-    if (chatMessage.trim() || attachedFile) {
+    if (chatMessage.trim()) {
       const userMessage = chatMessage.trim();
       setMessages(prev => [...prev, { type: 'user', content: userMessage }]);
-      
-      if (attachedFile) {
-        setMessages(prev => [
-          ...prev,
-          { type: 'user', content: `Sent a file: ${attachedFile.name}` }
-        ]);
-        setAttachedFile(null);
-      }
       
       if (isCompanyApplicationFlow) {
         const task = {
@@ -222,58 +196,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleFileUpload = async () => {
-    try {
-      const image = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: false,
-        resultType: CameraResultType.Uri,
-        source: CameraSource.Photos
-      });
-
-      if (image.webPath) {
-        const fileName = image.webPath.split('/').pop() || 'file';
-        const fileType = fileName.split('.').pop()?.toLowerCase() || '';
-        
-        let preview = '';
-        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
-          preview = image.webPath;
-        } else {
-          preview = getFileTypeIcon(fileType);
-        }
-
-        setAttachedFile({ 
-          name: fileName,
-          path: image.webPath,
-          type: fileType,
-          preview
-        });
-      }
-    } catch (err) {
-      console.error('Error picking file:', err);
-    }
-  };
-
-  const getFileTypeIcon = (fileType: string): string => {
-    switch (fileType) {
-      case 'pdf':
-        return '📄';
-      case 'doc':
-      case 'docx':
-        return '📝';
-      case 'xls':
-      case 'xlsx':
-        return '📊';
-      case 'txt':
-        return '📃';
-      case 'zip':
-      case 'rar':
-        return '📦';
-      default:
-        return '📎';
-    }
-  };
-
   const handleHistoryClick = () => {
     setShowHistoryPopover(true);
   };
@@ -288,21 +210,10 @@ const Dashboard: React.FC = () => {
     setIsFullPageChat(false);
   };
 
-  const handleInputFocus = () => {
-    setKeyboardOpen(true);
-    if (!(isPlatform('android') || isPlatform('ios'))) {
-      setTimeout(() => {
-        inputRef.current?.getInputElement().then((el) => {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
-      }, 200);
-    }
-  };
-
   if (isFullPageChat) {
     return (
       <IonPage>
-        <IonContent className="fullpage-chat-content">
+        <IonContent fullscreen className="fullpage-chat-content">
           <div className="fullpage-chat-container">
             <div className="fullpage-header">
               <IonButton 
@@ -347,26 +258,6 @@ const Dashboard: React.FC = () => {
                   autoGrow={true}
                   className="fullpage-textarea"
                 />
-                {attachedFile && (
-                  <div className="attached-file-chip">
-                    {attachedFile.preview && (
-                      <div className="file-preview">
-                        {attachedFile.preview.startsWith('data:') || attachedFile.preview.startsWith('http') ? (
-                          <img src={attachedFile.preview} alt={attachedFile.name} />
-                        ) : (
-                          <span className="file-icon">{attachedFile.preview}</span>
-                        )}
-                      </div>
-                    )}
-                    <div className="file-info">
-                      <span className="file-name">{attachedFile.name}</span>
-                      <span className="file-type">{attachedFile.type.toUpperCase()}</span>
-                    </div>
-                    <IonButton fill="clear" size="small" onClick={() => setAttachedFile(null)}>
-                      Remove
-                    </IonButton>
-                  </div>
-                )}
                 <div className="fullpage-actions">
                   <IonButton
                     fill="clear"
@@ -374,14 +265,6 @@ const Dashboard: React.FC = () => {
                     onClick={handleVoiceRecord}
                   >
                     <IonIcon icon={micOutline} slot="icon-only" />
-                  </IonButton>
-                  
-                  <IonButton
-                    fill="clear"
-                    className="fullpage-action-btn upload-btn"
-                    onClick={handleFileUpload}
-                  >
-                    <IonIcon icon={attachOutline} slot="icon-only" />
                   </IonButton>
                   
                   <IonButton
@@ -556,14 +439,6 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 <div className="right-actions">
-                  <IonButton
-                    fill="clear"
-                    className="action-button upload-btn"
-                    onClick={handleFileUpload}
-                  >
-                    <IonIcon icon={attachOutline} slot="icon-only" />
-                  </IonButton>
-                  
                   <IonButton
                     fill="clear"
                     className={`action-button send-btn ${chatMessage.trim() ? 'active' : 'inactive'}`}
