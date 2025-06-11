@@ -1,62 +1,73 @@
 import React, { useState, useEffect } from 'react';
+import DocumentUploader from '../components/DocumentUploader';
 import {
   IonContent,
   IonPage,
-  IonCard,
-  IonCardContent,
   IonIcon,
   IonButton,
-  IonText,
-  IonInput,
-  IonItem,
-  IonList,
-  IonAvatar,
   IonTextarea,
   IonPopover,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
 } from '@ionic/react';
 import {
   micOutline,
   sendOutline,
-  attachOutline,
   personOutline,
-  flash,
   timeOutline,
   chevronForwardOutline,
-  chatbubbleOutline,
   sparklesOutline,
   calendarOutline,
   clipboardOutline,
   bulbOutline,
-  timeSharp,
   checkboxOutline,
   flagOutline,
 } from 'ionicons/icons';
 import { motion } from 'framer-motion';
 import './Dashboard.css';
 
+// Add interface for Conversation type
+interface Conversation {
+  id: number;
+  title: string;
+  preview: string;
+  time: string;
+}
+
+interface Suggestion {
+  id: number;
+  text: string;
+  icon: string;
+}
+
+interface Event {
+  id: number;
+  title: string;
+  time: string;
+  urgent: boolean;
+}
+
 const Dashboard: React.FC = () => {
   const [greeting, setGreeting] = useState('');
+  
   const [currentTime, setCurrentTime] = useState(new Date());
   const [chatMessage, setChatMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isFullPageChat, setIsFullPageChat] = useState(false);
   const [showHistoryPopover, setShowHistoryPopover] = useState(false);
-  const [conversations, setConversations] = useState([
+  const [resetUploader, setResetUploader] = useState(0);
+  const [conversations, setConversations] = useState<Conversation[]>([
     { id: 1, title: 'Meeting preparation tips', preview: 'Can you help me prepare for tomorrow\'s...', time: '2h ago' },
     { id: 2, title: 'Travel itinerary planning', preview: 'I need help planning my trip to...', time: '1d ago' },
     { id: 3, title: 'Project deadline management', preview: 'How can I better manage my project...', time: '3d ago' },
     { id: 4, title: 'Email writing assistance', preview: 'Help me draft a professional email...', time: '1w ago' },
   ]);
 
-  const [suggestions] = useState([
+  const [suggestions] = useState<Suggestion[]>([
     { id: 1, text: 'Plan my day', icon: calendarOutline },
     { id: 2, text: 'Review upcoming tasks', icon: clipboardOutline },
     { id: 3, text: 'Give me insights', icon: bulbOutline },
     { id: 4, text: 'What should I focus on?', icon: sparklesOutline },
   ]);
+
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -68,19 +79,31 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const upcomingEvents = [
+  const upcomingEvents: Event[] = [
     { id: 1, title: 'Team Meeting', time: '10:00 AM', urgent: true },
     { id: 2, title: 'Lunch with Sarah', time: '1:00 PM', urgent: false },
     { id: 3, title: 'Doctor Appointment', time: '3:30 PM', urgent: true },
   ];
 
+  const addNewConversation = (message: string) => {
+    setConversations(prev => [
+      {
+        id: prev.length + 1,
+        title: message.slice(0, 30) + '...',
+        preview: message,
+        time: 'Just now'
+      },
+      ...prev.slice(0, 4) // Keep only last 5 conversations
+    ]);
+  };
+
   const handleSendMessage = () => {
     if (chatMessage.trim()) {
-      // Expand to full page chat like ChatGPT
+      addNewConversation(chatMessage);
       setIsFullPageChat(true);
-      // Here you would integrate with OpenAI API
       console.log('Sending message:', chatMessage);
       setChatMessage('');
+      setResetUploader(prev => prev + 1); // Reset uploaded files
     }
   };
 
@@ -93,17 +116,18 @@ const Dashboard: React.FC = () => {
     // Here you would implement voice recording functionality
   };
 
-  const handleFileUpload = () => {
-    // Here you would implement file upload functionality
-    console.log('File upload clicked');
+  const handleFileUpload = (file?: File) => {
+    // Optionally handle the uploaded file here
+    if (file) {
+      console.log('File uploaded:', file.name);
+    }
   };
 
   const handleHistoryClick = () => {
     setShowHistoryPopover(true);
   };
 
-  const handleConversationSelect = (conversation: any) => {
-    // Load the selected conversation
+  const handleConversationSelect = (conversation: Conversation) => {
     console.log('Loading conversation:', conversation.title);
     setShowHistoryPopover(false);
     setIsFullPageChat(true);
@@ -112,6 +136,7 @@ const Dashboard: React.FC = () => {
   const handleBackToChat = () => {
     setIsFullPageChat(false);
   };
+
 
   if (isFullPageChat) {
     return (
@@ -162,15 +187,7 @@ const Dashboard: React.FC = () => {
                   >
                     <IonIcon icon={micOutline} slot="icon-only" />
                   </IonButton>
-                  
-                  <IonButton
-                    fill="clear"
-                    className="fullpage-action-btn upload-btn"
-                    onClick={handleFileUpload}
-                  >
-                    <IonIcon icon={attachOutline} slot="icon-only" />
-                  </IonButton>
-                  
+                  <DocumentUploader onFileUpload={handleFileUpload} resetTrigger={resetUploader} />
                   <IonButton
                     fill="clear"
                     className={`fullpage-action-btn send-btn ${chatMessage.trim() ? 'active' : 'inactive'}`}
@@ -296,76 +313,62 @@ const Dashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Sticky Chat at Footer */}
-        <div className="chat-footer-sticky">
-          <div className="chat-center-container">
-            {/* AI Suggestions */}
-            <div className="ai-suggestions">
-              {suggestions.map((suggestion) => (
-                <motion.div
-                  key={suggestion.id}
-                  className="suggestion-chip"
-                  onClick={() => handleSuggestionClick(suggestion.text)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <IonIcon icon={suggestion.icon} />
-                  <span>{suggestion.text}</span>
-                </motion.div>
-              ))}
+        {/* AI Suggestions */}
+        <div className="ai-suggestions">
+          {suggestions.map((suggestion) => (
+            <motion.div
+              key={suggestion.id}
+              className="suggestion-chip"
+              onClick={() => handleSuggestionClick(suggestion.text)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <IonIcon icon={suggestion.icon} />
+              <span>{suggestion.text}</span>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="chat-input-section" style={{ position: 'relative' }}>
+          <IonTextarea
+            value={chatMessage}
+            onIonInput={(e) => setChatMessage(e.detail.value!)}
+            placeholder="How can I assist you today?"
+            rows={3}
+            className="chat-input-center"
+            autoGrow={true}
+            style={{ paddingTop: '40px' }}
+          />
+          <div className="chat-actions-row">
+            <div className="left-actions">
+              <IonButton
+                fill="clear"
+                className="action-button history-btn"
+                onClick={handleHistoryClick}
+                id="history-trigger"
+              >
+                <IonIcon icon={timeOutline} slot="icon-only" />
+              </IonButton>
             </div>
-
-            <div className="chat-input-section">
-              <IonTextarea
-                value={chatMessage}
-                onIonInput={(e) => setChatMessage(e.detail.value!)}
-                placeholder="How can I assist you today?"
-                rows={3}
-                className="chat-input-center"
-                autoGrow={true}
-              />
-              
-              <div className="chat-actions-row">
-                <div className="left-actions">
-                  <IonButton
-                    fill="clear"
-                    className="action-button history-btn"
-                    onClick={handleHistoryClick}
-                    id="history-trigger"
-                  >
-                    <IonIcon icon={timeOutline} slot="icon-only" />
-                  </IonButton>
-                </div>
-
-                <div className="middle-actions">
-                  <IonButton
-                    fill="clear"
-                    className={`action-button voice-btn ${isRecording ? 'recording' : ''}`}
-                    onClick={handleVoiceRecord}
-                  >
-                    <IonIcon icon={micOutline} slot="icon-only" />
-                  </IonButton>
-                </div>
-
-                <div className="right-actions">
-                  <IonButton
-                    fill="clear"
-                    className="action-button upload-btn"
-                    onClick={handleFileUpload}
-                  >
-                    <IonIcon icon={attachOutline} slot="icon-only" />
-                  </IonButton>
-                  
-                  <IonButton
-                    fill="clear"
-                    className={`action-button send-btn ${chatMessage.trim() ? 'active' : 'inactive'}`}
-                    onClick={handleSendMessage}
-                    disabled={!chatMessage.trim()}
-                  >
-                    <IonIcon icon={sendOutline} slot="icon-only" />
-                  </IonButton>
-                </div>
-              </div>
+            <div className="middle-actions">
+              <IonButton
+                fill="clear"
+                className={`action-button voice-btn ${isRecording ? 'recording' : ''}`}
+                onClick={handleVoiceRecord}
+              >
+                <IonIcon icon={micOutline} slot="icon-only" />
+              </IonButton>
+            </div>
+            <div className="right-actions">
+              <DocumentUploader onFileUpload={handleFileUpload} resetTrigger={resetUploader} />
+              <IonButton
+                fill="clear"
+                className={`action-button send-btn ${chatMessage.trim() ? 'active' : 'inactive'}`}
+                onClick={handleSendMessage}
+                disabled={!chatMessage.trim()}
+              >
+                <IonIcon icon={sendOutline} slot="icon-only" />
+              </IonButton>
             </div>
           </div>
         </div>
@@ -406,4 +409,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
