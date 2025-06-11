@@ -39,6 +39,15 @@
   margin-bottom: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: 8px;
+  display: flex; /* Ensure the weekdays are displayed in a row */
+  justify-content: space-between; /* Space out the columns evenly */
+}
+
+.weekdays ion-col {
+  flex: 1; /* Make each column take equal space */
+  text-align: center;
+  font-size: 14px;
+  padding: 4px;
 }
 
 .month-grid ion-col {
@@ -83,7 +92,14 @@
 .event-content {
   width: 100%;
 }
-
+.react-calendar {
+  width: 350px;
+  max-width: 100%;
+  /* background: white; */
+  /* border: 1px solid #a0a096; */
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  line-height: 1.125em;
+}
 .event-content h2 {
   font-size: 16px;
   font-weight: 600;
@@ -109,3 +125,77 @@
   color: var(--ion-color-primary);
   flex-shrink: 0;
 } 
+
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.calendar-controls h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.highlighted {
+  background-color: #6C5CE7; /* Today's date color */
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.today {
+  background-color: #6C5CE7; /* Today's date color */
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+}
+.today {
+  /* background-color: #d0f0fd; */
+  border-radius: 50%;
+  font-weight: bold;
+  color: #007aff;
+}
+.selected {
+  background-color: #6C5CE7; /* Highlight color */
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.today {
+  /* background-color: #f4f4f4; Today's date color */
+  font-weight: bold;
+}
+
+/* Responsive Design */
+
+/* @media (max-width: 768px) {
+  .weekdays ion-col {
+    font-size: 12px; 
+    padding: 2px;
+  }
+
+  .month-grid ion-col {
+    font-size: 12px;
+    padding: 8px;
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .weekdays ion-col {
+    font-size: 10px; 
+    padding: 1px;
+  }
+
+  .month-grid ion-col {
+    font-size: 10px;
+    padding: 6px;
+    min-height: 35px;
+  }
+} */
+
+/*  */
+
