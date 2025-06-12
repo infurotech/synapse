@@ -45,8 +45,11 @@ const Calendar: React.FC = () => {
 
   const events: Event[] = [
     { title: 'Team Standup', time: '9:00 AM - 9:30 AM', location: 'Conference Room A', date: '5/6/2025' },
+    { title: 'Team Standup', time: '9:00 AM - 9:30 AM', location: 'Conference Room A', date: '5/6/2025' },
     { title: 'Project Review', time: '2:00 PM - 3:00 PM', location: 'Virtual Meeting', date: '6/6/2025' },
     { title: 'Project Review', time: '2:00 PM - 3:00 PM', location: 'Virtual Meeting', date: '10/6/2025' },
+    { title: 'Project Review', time: '2:00 PM - 3:00 PM', location: 'Virtual Meeting', date: '10/7/2025' },
+    { title: 'Project Review', time: '2:00 PM - 3:00 PM', location: 'Virtual Meeting', date: '10/7/2026' },
   ];
 
   useEffect(() => {

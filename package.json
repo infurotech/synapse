@@ -12,11 +12,11 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@capacitor/android": "^7.2.0",
+    "@capacitor/android": "^7.3.0",
     "@capacitor/app": "7.0.1",
     "@capacitor/core": "^7.2.0",
     "@capacitor/haptics": "7.0.1",
-    "@capacitor/ios": "^7.2.0",
+    "@capacitor/ios": "^7.3.0",
     "@capacitor/keyboard": "7.0.1",
     "@capacitor/status-bar": "7.0.1",
     "@ionic/react": "^8.5.0",
@@ -28,7 +28,6 @@
     "ionicons": "^7.4.0",
     "lucide-react": "^0.513.0",
     "react": "19.0.0",
-    "react-calendar": "^6.0.0",
     "react-dom": "19.0.0",
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4"
