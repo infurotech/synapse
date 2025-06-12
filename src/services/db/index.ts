@@ -1,7 +1,7 @@
-import DatabaseService from './DatabaseService';
-import DatabaseAgent from './DatabaseAgent';
+import DatabaseAgent from './DatabaseService';
 import Schema from './DatabaseSchema';
 import type {
+  User,
   Task,
   TaskPriority,
   TaskStatus,
@@ -24,8 +24,8 @@ export const initializeDatabase = async (): Promise<void> => {
   }
 
   try {
-    const dbService = DatabaseService.getInstance();
-    await dbService.initializeDatabase();
+    const dbAgent = DatabaseAgent.getInstance();
+    await dbAgent.initializeDatabase();
     isDbInitialized = true;
     console.log('Database initialized successfully');
   } catch (error) {
@@ -36,13 +36,13 @@ export const initializeDatabase = async (): Promise<void> => {
 
 // Export schema-related services
 export {
-  DatabaseService,
   DatabaseAgent,
   Schema
 };
 
 // Export database interfaces
 export type {
+  User,
   Task,
   TaskPriority,
   TaskStatus,
