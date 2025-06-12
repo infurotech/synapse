@@ -1,36 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   IonContent,
   IonPage,
-  IonCard,
-  IonCardContent,
   IonIcon,
   IonButton,
-  IonText,
-  IonInput,
-  IonItem,
-  IonList,
-  IonAvatar,
   IonTextarea,
   IonPopover,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
 } from '@ionic/react';
 import {
   micOutline,
   sendOutline,
   attachOutline,
   personOutline,
-  flash,
   timeOutline,
   chevronForwardOutline,
-  chatbubbleOutline,
   sparklesOutline,
   calendarOutline,
   clipboardOutline,
   bulbOutline,
-  timeSharp,
   checkboxOutline,
   flagOutline,
 } from 'ionicons/icons';
@@ -68,7 +55,6 @@ const Dashboard: React.FC = () => {
     { id: 4, text: 'What should I focus on?', icon: sparklesOutline }
   ]);
 
-  const inputRef = useRef<HTMLIonTextareaElement>(null);
 
   useEffect(() => {
     const hour = new Date().getHours();
