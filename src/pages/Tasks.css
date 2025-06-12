@@ -1,50 +1,35 @@
 .tasks-content {
-  --background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  --background: var(--cred-gradient-dark);
 }
 
 .tasks-container {
   padding: 16px;
-  min-height: 100vh;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.section-title {
-  margin: 0 0 16px 16px;
-  font-size: 1.5em;
-  font-weight: 600;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .tasks-section {
-  margin: 0;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: white;
+  padding-left: 0;
 }
 
 .task-item {
   padding: 16px;
-  margin-bottom: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .task-item:last-child {
-  margin-bottom: 0;
-}
-
-.task-item:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border-bottom: none;
 }
 
 .task-header {
@@ -54,62 +39,32 @@
 }
 
 .task-header ion-icon {
-  font-size: 24px;
-  flex-shrink: 0;
+  font-size: 20px;
   color: var(--ion-color-primary);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  flex-shrink: 0;
 }
 
 .task-content {
   flex: 1;
-  min-width: 0;
 }
 
 .task-content h2 {
-  margin: 0;
-  font-size: 1.1em;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
   color: white;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .task-content p {
-  margin: 4px 0 0 0;
-  font-size: 0.9em;
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.7);
+  margin: 0;
 }
 
 .task-header ion-badge {
-  margin-left: auto;
-  font-weight: 500;
   padding: 6px 12px;
   border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.no-tasks {
-  text-align: center;
-  padding: 32px 16px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 1.1em;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-/* Priority badge colors */
-ion-badge[color="danger"] {
-  --ion-color-base: var(--ion-color-danger);
-  --ion-color-contrast: white;
-}
-
-ion-badge[color="warning"] {
-  --ion-color-base: var(--ion-color-warning);
-  --ion-color-contrast: white;
-}
-
-ion-badge[color="success"] {
-  --ion-color-base: var(--ion-color-success);
-  --ion-color-contrast: white;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
 } 
