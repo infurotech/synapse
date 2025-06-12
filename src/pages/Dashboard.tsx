@@ -36,7 +36,6 @@ import {
 } from 'ionicons/icons';
 import { motion } from 'framer-motion';
 import { isPlatform } from '@ionic/react';
-import { Keyboard } from '@capacitor/keyboard';
 import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import './Dashboard.css';
 
@@ -49,7 +48,6 @@ interface Conversation {
 
 const Dashboard: React.FC = () => {
   const [greeting, setGreeting] = useState('');
-  const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullPageChat, setIsFullPageChat] = useState(false);
   const [showHistoryPopover, setShowHistoryPopover] = useState(false);
@@ -82,22 +80,6 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (isPlatform('android') || isPlatform('ios')) {
-      const showSub = Keyboard.addListener('keyboardWillShow', () => {
-        setKeyboardOpen(true);
-      });
-      const hideSub = Keyboard.addListener('keyboardWillHide', () => {
-        setKeyboardOpen(false);
-      });
-  
-      return () => {
-        showSub.then(sub => sub.remove());
-        hideSub.then(sub => sub.remove());
-      };
-    }
-  }, []);
-
   const upcomingEvents = [
     { id: 1, title: 'Team Meeting', time: '10:00 AM', urgent: true },
     { id: 2, title: 'Lunch with Sarah', time: '1:00 PM', urgent: false },
@@ -106,9 +88,7 @@ const Dashboard: React.FC = () => {
 
   const handleSendMessage = () => {
     if (chatMessage.trim()) {
-      // Expand to full page chat like ChatGPT
       setIsFullPageChat(true);
-      // Here you would integrate with OpenAI API
       console.log('Sending message:', chatMessage);
       setChatMessage('');
     }
@@ -117,13 +97,6 @@ const Dashboard: React.FC = () => {
   const handleSuggestionClick = (suggestion: string) => {
     setChatMessage(suggestion);
     setIsFullPageChat(true);
-    // if (suggestion === 'Apply to a company') {
-    //   // setIsCompanyApplicationFlow(true);
-    //   setMessages([{ 
-    //     type: 'ai', 
-    //     content: 'Okay, so what company are you focusing upon?' 
-    //   }]);
-    // }
   };
 
   const handleVoiceRecord = async () => {
@@ -168,36 +141,6 @@ const Dashboard: React.FC = () => {
   };
 
   const handleFileUpload = async () => {
-    // try {
-    //   const image = await Camera.getPhoto({
-    //     quality: 90,
-    //     allowEditing: false,
-    //     resultType: CameraResultType.Uri,
-    //     source: CameraSource.Photos
-    //   });
-
-    //   if (image.webPath) {
-    //     const fileName = image.webPath.split('/').pop() || 'file';
-    //     const fileType = fileName.split('.').pop()?.toLowerCase() || '';
-        
-    //     let preview = '';
-    //     if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
-    //       preview = image.webPath;
-    //     } else {
-    //       preview = getFileTypeIcon(fileType);
-    //     }
-
-    //     setAttachedFile({ 
-    //       name: fileName,
-    //       path: image.webPath,
-    //       type: fileType,
-    //       preview
-    //     });
-    //   }
-    // } catch (err) {
-    //   console.error('Error picking file:', err);
-    // }
-
     console.log('File upload clicked');
   };
 
