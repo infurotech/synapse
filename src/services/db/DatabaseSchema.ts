@@ -5,6 +5,13 @@
 
 
 // Task schema
+export interface User {
+  id: number;
+  email: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export enum TaskPriority {
   HIGH = 'high',
   MEDIUM = 'medium',
@@ -75,6 +82,7 @@ export interface Message {
 
 // Database table names
 export enum TableName {
+  USERS = 'users',
   TASKS = 'tasks',
   CALENDAR_EVENTS = 'calendar_events',
   GOALS = 'goals',
@@ -84,6 +92,7 @@ export enum TableName {
 
 // Database schema map
 export interface DatabaseSchema {
+  [TableName.USERS]: User;
   [TableName.TASKS]: Task;
   [TableName.CALENDAR_EVENTS]: CalendarEvent;
   [TableName.GOALS]: Goal;
