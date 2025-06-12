@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   IonContent,
   IonPage,
@@ -11,15 +11,20 @@ import {
   IonCardContent,
   IonIcon,
   IonBadge,
+  IonFab,
+  IonFabButton,
 } from '@ionic/react';
 import {
   checkmarkCircleOutline,
   timeOutline,
   flagOutline,
+  chatbubbleOutline,
 } from 'ionicons/icons';
 import './Tasks.css';
 
 const Tasks: React.FC = () => {
+  const [showAI, setShowAI] = useState(false);
+
   return (
     <IonPage>
       <IonHeader>
@@ -69,7 +74,16 @@ const Tasks: React.FC = () => {
               </div>
             </IonCardContent>
           </IonCard>
+
+          {/* AI Assistant */}
         </div>
+
+        {/* Floating action button to toggle AI Assistant */}
+        <IonFab vertical="bottom" horizontal="end" slot="fixed">
+          <IonFabButton onClick={() => setShowAI(!showAI)}>
+            <IonIcon icon={chatbubbleOutline} />
+          </IonFabButton>
+        </IonFab>
       </IonContent>
     </IonPage>
   );

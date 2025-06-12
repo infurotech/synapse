@@ -2,20 +2,13 @@ import React, { useState } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import {
   IonApp,
-  IonIcon,
-  IonLabel,
   IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
   IonTabs,
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { 
-  flash, 
-  listOutline, 
-  calendarOutline, 
-  trendingUpOutline 
+
 } from 'ionicons/icons';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
