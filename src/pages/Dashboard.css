@@ -845,11 +845,12 @@
   color: var(--ion-color-primary);
 }
 
-.fullpage-messages-scrollable {
-  flex: 1 1 auto;
-  overflow-y: auto;
+.fullpage-messages {
+  flex: 1;
   padding: 20px;
-  /* Optional: add background, etc. */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .message-container {
@@ -887,7 +888,6 @@
 }
 
 .fullpage-input-section {
-  flex-shrink: 0;
   padding: 20px;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: var(--glass-backdrop);
@@ -1020,7 +1020,7 @@
 
 /* Sticky Chat Footer */
 .chat-footer-sticky {
-  position: fixed; 
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
@@ -1178,83 +1178,4 @@
   --box-shadow: none;
   height: auto;
   margin: 0;
-}
-
-.fullpage-input-section.keyboard-open {
-  position: relative;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: var(--ion-background-color, #181c27);
-  /* Optional: add padding or shadow */
-}
-
-.fullpage-messages.keyboard-open {
-  padding-bottom: 350px; /* or adjust to fit your keyboard height */
-}
-
-.attached-file-chip {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(108, 92, 231, 0.1);
-  border: 1px solid rgba(108, 92, 231, 0.2);
-  border-radius: 12px;
-  padding: 12px;
-  margin: 8px 0;
-}
-
-.file-preview {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(108, 92, 231, 0.15);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.file-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.file-icon {
-  font-size: 24px;
-}
-
-.file-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.file-name {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.file-type {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-}
-
-.attached-file-chip ion-button {
-  --padding-start: 4px;
-  --padding-end: 4px;
-  --color: rgba(255, 255, 255, 0.6);
-  font-size: 0.8rem;
-}
-
-.attached-file-chip ion-button:hover {
-  --color: rgba(255, 255, 255, 0.9);
 } 
