@@ -13,17 +13,24 @@ import {
   IonAvatar,
   IonTextarea,
   IonPopover,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
 } from '@ionic/react';
 import {
   micOutline,
   sendOutline,
+  attachOutline,
   personOutline,
+  flash,
   timeOutline,
   chevronForwardOutline,
+  chatbubbleOutline,
   sparklesOutline,
   calendarOutline,
   clipboardOutline,
   bulbOutline,
+  timeSharp,
   checkboxOutline,
   flagOutline,
 } from 'ionicons/icons';
@@ -32,11 +39,6 @@ import { isPlatform } from '@ionic/react';
 import { Keyboard } from '@capacitor/keyboard';
 import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import './Dashboard.css';
-
-interface Message {
-  type: 'user' | 'ai';
-  content: string;
-}
 
 interface Conversation {
   id: number;
@@ -51,11 +53,9 @@ const Dashboard: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullPageChat, setIsFullPageChat] = useState(false);
   const [showHistoryPopover, setShowHistoryPopover] = useState(false);
-  const [isCompanyApplicationFlow, setIsCompanyApplicationFlow] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
 
-  const [messages, setMessages] = useState<Message[]>([]);
   const [conversations] = useState<Conversation[]>([
     { id: 1, title: 'Meeting preparation tips', preview: 'Can you help me prepare for tomorrow\'s...', time: '2h ago' },
     { id: 2, title: 'Travel itinerary planning', preview: 'I need help planning my trip to...', time: '1d ago' },
@@ -67,8 +67,7 @@ const Dashboard: React.FC = () => {
     { id: 1, text: 'Plan my day', icon: calendarOutline },
     { id: 2, text: 'Review upcoming tasks', icon: clipboardOutline },
     { id: 3, text: 'Give me insights', icon: bulbOutline },
-    { id: 4, text: 'What should I focus on?', icon: sparklesOutline },
-    { id: 5, text: 'Apply to a company', icon: flagOutline },
+    { id: 4, text: 'What should I focus on?', icon: sparklesOutline }
   ]);
 
   const inputRef = useRef<HTMLIonTextareaElement>(null);
@@ -107,52 +106,24 @@ const Dashboard: React.FC = () => {
 
   const handleSendMessage = () => {
     if (chatMessage.trim()) {
-      const userMessage = chatMessage.trim();
-      setMessages(prev => [...prev, { type: 'user', content: userMessage }]);
-      
-      if (isCompanyApplicationFlow) {
-        const task = {
-          id: Date.now().toString(),
-          title: `Apply to ${userMessage}`,
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          priority: 'High',
-          status: 'pending',
-          type: 'company_application'
-        };
-        
-        const savedTasks = localStorage.getItem('tasks');
-        const tasks = savedTasks ? JSON.parse(savedTasks) : [];
-        tasks.push(task);
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-        
-        setMessages(prev => [...prev, { 
-          type: 'ai', 
-          content: `I've created a task for applying to ${userMessage}. Good luck with your application!` 
-        }]);
-        
-        setIsCompanyApplicationFlow(false);
-      } else if (userMessage === 'Apply to a company') {
-        setIsCompanyApplicationFlow(true);
-        setMessages(prev => [...prev, { 
-          type: 'ai', 
-          content: 'Okay, so what company are you focusing upon?' 
-        }]);
-      }
-      
+      // Expand to full page chat like ChatGPT
+      setIsFullPageChat(true);
+      // Here you would integrate with OpenAI API
+      console.log('Sending message:', chatMessage);
       setChatMessage('');
     }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
-    setChatMessage('');
+    setChatMessage(suggestion);
     setIsFullPageChat(true);
-    if (suggestion === 'Apply to a company') {
-      setIsCompanyApplicationFlow(true);
-      setMessages([{ 
-        type: 'ai', 
-        content: 'Okay, so what company are you focusing upon?' 
-      }]);
-    }
+    // if (suggestion === 'Apply to a company') {
+    //   // setIsCompanyApplicationFlow(true);
+    //   setMessages([{ 
+    //     type: 'ai', 
+    //     content: 'Okay, so what company are you focusing upon?' 
+    //   }]);
+    // }
   };
 
   const handleVoiceRecord = async () => {
@@ -196,6 +167,42 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleFileUpload = async () => {
+    // try {
+    //   const image = await Camera.getPhoto({
+    //     quality: 90,
+    //     allowEditing: false,
+    //     resultType: CameraResultType.Uri,
+    //     source: CameraSource.Photos
+    //   });
+
+    //   if (image.webPath) {
+    //     const fileName = image.webPath.split('/').pop() || 'file';
+    //     const fileType = fileName.split('.').pop()?.toLowerCase() || '';
+        
+    //     let preview = '';
+    //     if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+    //       preview = image.webPath;
+    //     } else {
+    //       preview = getFileTypeIcon(fileType);
+    //     }
+
+    //     setAttachedFile({ 
+    //       name: fileName,
+    //       path: image.webPath,
+    //       type: fileType,
+    //       preview
+    //     });
+    //   }
+    // } catch (err) {
+    //   console.error('Error picking file:', err);
+    // }
+
+    console.log('File upload clicked');
+  };
+
+  
+
   const handleHistoryClick = () => {
     setShowHistoryPopover(true);
   };
@@ -229,30 +236,23 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             
-            <div className="fullpage-messages-scrollable">
-              {messages.map((message, index) => (
-                <div key={index} className={`message-container ${message.type}`}>
-                  <div className={`${message.type}-message`}>
-                    <p>{message.content}</p>
-                  </div>
+            <div className="fullpage-messages">
+              {/* Chat messages would go here */}
+              <div className="message-container">
+                <div className="user-message">
+                  <p>Hello, how can I help you today?</p>
                 </div>
-              ))}
+                <div className="ai-message">
+                  <p>I'm here to assist you with any questions or tasks you have. What would you like to work on?</p>
+                </div>
+              </div>
             </div>
             
-            <div className={`fullpage-input-section ${keyboardOpen ? 'keyboard-open' : ''}`}>
+            <div className="fullpage-input-section">
               <div className="fullpage-chat-input">
                 <IonTextarea
-                   ref={inputRef}
-                   onFocus={() => {
-                     setKeyboardOpen(true);
-                     setTimeout(() => {
-                       inputRef.current?.getInputElement().then((el) => {
-                         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                       });
-                     }, 300);
-                   }}
-                   value={chatMessage}
-                   onIonInput={(e) => setChatMessage(e.detail.value!)}
+                  value={chatMessage}
+                  onIonInput={(e) => setChatMessage(e.detail.value!)}
                   placeholder="Message Nexus..."
                   rows={1}
                   autoGrow={true}
@@ -265,6 +265,14 @@ const Dashboard: React.FC = () => {
                     onClick={handleVoiceRecord}
                   >
                     <IonIcon icon={micOutline} slot="icon-only" />
+                  </IonButton>
+                  
+                  <IonButton
+                    fill="clear"
+                    className="fullpage-action-btn upload-btn"
+                    onClick={handleFileUpload}
+                  >
+                    <IonIcon icon={attachOutline} slot="icon-only" />
                   </IonButton>
                   
                   <IonButton
@@ -286,8 +294,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="dashboard-content">
+      <IonContent fullscreen className="dashboard-content">
         <div className="dashboard-container">
+          {/* Enhanced Greeting Section - Bigger without time */}
           <motion.div
             className="greeting-section-top"
             initial={{ opacity: 0, y: -30 }}
@@ -326,6 +335,7 @@ const Dashboard: React.FC = () => {
             </div>
           </motion.div>
 
+          {/* Four Icons Row */}
           <motion.div
             className="quick-icons-section"
             initial={{ opacity: 0, y: 20 }}
@@ -360,6 +370,7 @@ const Dashboard: React.FC = () => {
             </div>
           </motion.div>
 
+          {/* Quick Events List - Clean and Minimal */}
           {upcomingEvents.length > 0 && (
             <motion.div
               className="quick-events-section"
@@ -389,8 +400,10 @@ const Dashboard: React.FC = () => {
           )}
         </div>
 
+        {/* Sticky Chat at Footer */}
         <div className="chat-footer-sticky">
           <div className="chat-center-container">
+            {/* AI Suggestions */}
             <div className="ai-suggestions">
               {suggestions.map((suggestion) => (
                 <motion.div
@@ -441,6 +454,14 @@ const Dashboard: React.FC = () => {
                 <div className="right-actions">
                   <IonButton
                     fill="clear"
+                    className="action-button upload-btn"
+                    onClick={handleFileUpload}
+                  >
+                    <IonIcon icon={attachOutline} slot="icon-only" />
+                  </IonButton>
+                  
+                  <IonButton
+                    fill="clear"
                     className={`action-button send-btn ${chatMessage.trim() ? 'active' : 'inactive'}`}
                     onClick={handleSendMessage}
                     disabled={!chatMessage.trim()}
@@ -453,6 +474,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* History Popover */}
         <IonPopover
           isOpen={showHistoryPopover}
           onDidDismiss={() => setShowHistoryPopover(false)}
