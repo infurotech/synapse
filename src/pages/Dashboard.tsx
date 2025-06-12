@@ -2,40 +2,28 @@ import React, { useState, useEffect } from 'react';
 import {
   IonContent,
   IonPage,
-  IonCard,
-  IonCardContent,
   IonIcon,
   IonButton,
-  IonText,
-  IonInput,
-  IonItem,
-  IonList,
-  IonAvatar,
   IonTextarea,
   IonPopover,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
 } from '@ionic/react';
 import {
   micOutline,
   sendOutline,
   attachOutline,
   personOutline,
-  flash,
   timeOutline,
   chevronForwardOutline,
-  chatbubbleOutline,
   sparklesOutline,
   calendarOutline,
   clipboardOutline,
   bulbOutline,
-  timeSharp,
   checkboxOutline,
   flagOutline,
 } from 'ionicons/icons';
 import { motion } from 'framer-motion';
 import './Dashboard.css';
+import { useConversation } from '../contexts/ConversationContext';
 
 const Dashboard: React.FC = () => {
   const [greeting, setGreeting] = useState('');
@@ -44,12 +32,14 @@ const Dashboard: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isFullPageChat, setIsFullPageChat] = useState(false);
   const [showHistoryPopover, setShowHistoryPopover] = useState(false);
-  const [conversations, setConversations] = useState([
-    { id: 1, title: 'Meeting preparation tips', preview: 'Can you help me prepare for tomorrow\'s...', time: '2h ago' },
-    { id: 2, title: 'Travel itinerary planning', preview: 'I need help planning my trip to...', time: '1d ago' },
-    { id: 3, title: 'Project deadline management', preview: 'How can I better manage my project...', time: '3d ago' },
-    { id: 4, title: 'Email writing assistance', preview: 'Help me draft a professional email...', time: '1w ago' },
-  ]);
+  
+  const { 
+    conversations, 
+    currentConversation, 
+    selectConversation, 
+    addConversation, 
+    addMessageToConversation 
+  } = useConversation();
 
   const [suggestions] = useState([
     { id: 1, text: 'Plan my day', icon: calendarOutline },
@@ -76,10 +66,46 @@ const Dashboard: React.FC = () => {
 
   const handleSendMessage = () => {
     if (chatMessage.trim()) {
-      // Expand to full page chat like ChatGPT
-      setIsFullPageChat(true);
-      // Here you would integrate with OpenAI API
-      console.log('Sending message:', chatMessage);
+      // Check if we're in the full-page chat view (existing conversation)
+      if (isFullPageChat && currentConversation) {
+        // Add message to existing conversation
+        addMessageToConversation(currentConversation.id, {
+          content: chatMessage,
+          sender: 'user'
+        });
+        
+        // Simulate AI response
+        setTimeout(() => {
+          addMessageToConversation(currentConversation.id, {
+            content: `I'm processing your request about "${chatMessage}". Can you provide more details?`,
+            sender: 'ai'
+          });
+        }, 1000);
+      } else {
+        // Create a new conversation when sending from the Dashboard's main input
+        setIsFullPageChat(true);
+        
+        const newConversationId = addConversation({
+          title: "New Conversation",
+          preview: "",
+          messages: []
+        });
+        
+        // Add the user's message to the new conversation
+        addMessageToConversation(newConversationId, {
+          content: chatMessage,
+          sender: 'user'
+        });
+        
+        // Simulate AI response (in a real app, this would be from your AI service)
+        setTimeout(() => {
+          addMessageToConversation(newConversationId, {
+            content: `I'm here to help with "${chatMessage}". What would you like to know?`,
+            sender: 'ai'
+          });
+        }, 1000);
+      }
+      
       setChatMessage('');
     }
   };
@@ -102,9 +128,9 @@ const Dashboard: React.FC = () => {
     setShowHistoryPopover(true);
   };
 
-  const handleConversationSelect = (conversation: any) => {
-    // Load the selected conversation
-    console.log('Loading conversation:', conversation.title);
+  const handleConversationSelect = (conversationId: string) => {
+    // Select the conversation
+    selectConversation(conversationId);
     setShowHistoryPopover(false);
     setIsFullPageChat(true);
   };
@@ -113,7 +139,7 @@ const Dashboard: React.FC = () => {
     setIsFullPageChat(false);
   };
 
-  if (isFullPageChat) {
+  if (isFullPageChat && currentConversation) {
     return (
       <IonPage>
         <IonContent fullscreen className="fullpage-chat-content">
@@ -128,20 +154,18 @@ const Dashboard: React.FC = () => {
               </IonButton>
               <div className="fullpage-title">
                 <img src="logo-white.png" alt="Synapse Logo" style={{width: '20px', height: '20px'}} />
-                <span>Synapse AI</span>
+                <span>{currentConversation.title}</span>
               </div>
             </div>
             
             <div className="fullpage-messages">
-              {/* Chat messages would go here */}
-              <div className="message-container">
-                <div className="user-message">
-                  <p>Hello, how can I help you today?</p>
+              {currentConversation.messages.map((message) => (
+                <div key={message.id} className="message-container">
+                  <div className={`${message.sender === 'user' ? 'user-message' : 'ai-message'}`}>
+                    <p>{message.content}</p>
+                  </div>
                 </div>
-                <div className="ai-message">
-                  <p>I'm here to assist you with any questions or tasks you have. What would you like to work on?</p>
-                </div>
-              </div>
+              ))}
             </div>
             
             <div className="fullpage-input-section">
@@ -386,7 +410,7 @@ const Dashboard: React.FC = () => {
                 <div 
                   key={conversation.id} 
                   className="history-conversation-item"
-                  onClick={() => handleConversationSelect(conversation)}
+                  onClick={() => handleConversationSelect(conversation.id)}
                 >
                   <div className="history-conversation-content">
                     <h4 className="history-conversation-title">{conversation.title}</h4>

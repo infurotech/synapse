@@ -20,12 +20,9 @@ import {
   flagOutline,
   chatbubbleOutline,
 } from 'ionicons/icons';
-import AIAssistant from '../components/AIAssistant';
 import './Tasks.css';
 
 const Tasks: React.FC = () => {
-  // Mock user ID for demo purposes
-  const userId = 1;
   const [showAI, setShowAI] = useState(false);
 
   return (
@@ -79,7 +76,6 @@ const Tasks: React.FC = () => {
           </IonCard>
 
           {/* AI Assistant */}
-          {showAI && <AIAssistant userId={userId} />}
         </div>
 
         {/* Floating action button to toggle AI Assistant */}

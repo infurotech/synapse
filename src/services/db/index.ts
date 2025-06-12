@@ -1,9 +1,17 @@
 import DatabaseService from './DatabaseService';
-import UserRepository, { User } from './UserRepository';
-import TaskRepository, { Task, TaskPriority, TaskStatus } from './TaskRepository';
-import CalendarEventRepository, { CalendarEvent } from './CalendarEventRepository';
-import GoalRepository, { Goal } from './GoalRepository';
-import ConversationRepository, { Conversation, Message } from './ConversationRepository';
+import DatabaseAgent from './DatabaseAgent';
+import Schema from './DatabaseSchema';
+import type {
+  Task,
+  TaskPriority,
+  TaskStatus,
+  CalendarEvent,
+  Goal,
+  Conversation,
+  Message,
+  DatabaseSchema,
+  TableName
+} from './DatabaseSchema';
 
 // Track if database has been initialized
 let isDbInitialized = false;
@@ -26,52 +34,24 @@ export const initializeDatabase = async (): Promise<void> => {
   }
 };
 
-// Export all repositories
+// Export schema-related services
 export {
   DatabaseService,
-  UserRepository,
-  TaskRepository,
-  CalendarEventRepository,
-  GoalRepository,
-  ConversationRepository
+  DatabaseAgent,
+  Schema
 };
 
-// Export all interfaces
+// Export database interfaces
 export type {
-  User,
   Task,
   TaskPriority,
   TaskStatus,
   CalendarEvent,
   Goal,
   Conversation,
-  Message
+  Message,
+  DatabaseSchema,
+  TableName
 };
 
-// Create a class that provides access to all repositories
-export class DatabaseRepositories {
-  private static instance: DatabaseRepositories;
-  
-  public readonly userRepository: UserRepository;
-  public readonly taskRepository: TaskRepository;
-  public readonly calendarEventRepository: CalendarEventRepository;
-  public readonly goalRepository: GoalRepository;
-  public readonly conversationRepository: ConversationRepository;
-
-  private constructor() {
-    this.userRepository = new UserRepository();
-    this.taskRepository = new TaskRepository();
-    this.calendarEventRepository = new CalendarEventRepository();
-    this.goalRepository = new GoalRepository();
-    this.conversationRepository = new ConversationRepository();
-  }
-
-  public static getInstance(): DatabaseRepositories {
-    if (!DatabaseRepositories.instance) {
-      DatabaseRepositories.instance = new DatabaseRepositories();
-    }
-    return DatabaseRepositories.instance;
-  }
-}
-
-export default DatabaseRepositories; 
+export default DatabaseAgent; 

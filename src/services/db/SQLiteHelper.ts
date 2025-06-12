@@ -17,7 +17,7 @@ export class SQLiteHelper {
   public static async run(
     db: SQLiteDBConnection, 
     statement: string, 
-    values: any[] = []
+    values: unknown[] = []
   ): Promise<capSQLiteChanges> {
     return await db.run(statement, values);
   }
@@ -28,7 +28,7 @@ export class SQLiteHelper {
   public static async query<T>(
     db: SQLiteDBConnection, 
     statement: string, 
-    values: any[] = []
+    values: unknown[] = []
   ): Promise<{ values?: T[] | undefined }> {
     return await db.query(statement, values);
   }

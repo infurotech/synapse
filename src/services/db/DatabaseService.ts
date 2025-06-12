@@ -68,28 +68,10 @@ export class DatabaseService {
       throw new Error('Database connection not established');
     }
 
-    // Users table
-    await this.db.execute(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        email TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
-        first_name TEXT,
-        last_name TEXT,
-        avatar TEXT,
-        theme_preference TEXT DEFAULT 'system',
-        notifications_enabled INTEGER DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
     // Tasks table
     await this.db.execute(`
       CREATE TABLE IF NOT EXISTS tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
         title TEXT NOT NULL,
         description TEXT,
         due_date TIMESTAMP,
@@ -97,7 +79,6 @@ export class DatabaseService {
         status TEXT CHECK(status IN ('pending', 'in_progress', 'completed', 'cancelled')) DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       );
     `);
 
@@ -105,17 +86,13 @@ export class DatabaseService {
     await this.db.execute(`
       CREATE TABLE IF NOT EXISTS calendar_events (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
         title TEXT NOT NULL,
         description TEXT,
         start_time TIMESTAMP NOT NULL,
         end_time TIMESTAMP NOT NULL,
         location TEXT,
-        is_all_day INTEGER DEFAULT 0,
-        recurrence TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       );
     `);
 
@@ -123,17 +100,14 @@ export class DatabaseService {
     await this.db.execute(`
       CREATE TABLE IF NOT EXISTS goals (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
         title TEXT NOT NULL,
         description TEXT,
         target_value REAL NOT NULL,
         current_value REAL DEFAULT 0.0,
         due_date TIMESTAMP,
         category TEXT,
-        tags TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       );
     `);
 
@@ -141,12 +115,10 @@ export class DatabaseService {
     await this.db.execute(`
       CREATE TABLE IF NOT EXISTS conversations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
         title TEXT NOT NULL,
         last_message TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       );
     `);
 

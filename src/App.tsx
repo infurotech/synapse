@@ -23,7 +23,6 @@ import Tasks from './pages/Tasks';
 import Calendar from './pages/Calendar';
 import Goals from './pages/Goals';
 import Profile from './pages/Profile';
-import AIDebugPage from './pages/AIDebugPage';
 import SplashScreen from './components/SplashScreen';
 import { ThemeProvider } from './contexts/ThemeContext';
 
@@ -97,9 +96,6 @@ const App: React.FC = () => {
               </Route>
               <Route exact path="/profile">
                 <Profile />
-              </Route>
-              <Route exact path="/ai-debug">
-                <AIDebugPage />
               </Route>
               <Route exact path="/">
                 <Redirect to="/login" />

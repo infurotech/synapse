@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.synapse.app-mergeDebugResources-36:/values-v27/values-v27.xml",
+            "outputFile": "com.synapse.app-mergeDebugResources-31:/values-v27/values-v27.xml",
             "map": [
                 {
                     "source": "C:\\Users\\admin\\.gradle\\caches\\8.11.1\\transforms\\ef234481c09f01fb9f0508a5da2b1126\\transformed\\core-splashscreen-1.0.1\\res\\values-v27\\values-v27.xml",

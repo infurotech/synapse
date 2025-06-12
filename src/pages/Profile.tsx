@@ -11,7 +11,6 @@ import {
   IonCardContent,
   IonIcon,
   IonToggle,
-  IonRouterLink,
 } from '@ionic/react';
 import {
   personOutline,
@@ -22,7 +21,6 @@ import {
   lockClosedOutline,
   helpCircleOutline,
   logOutOutline,
-  bulbOutline,
 } from 'ionicons/icons';
 import { useTheme } from '../contexts/ThemeContext';
 import './Profile.css';
@@ -116,17 +114,6 @@ const Profile: React.FC = () => {
                 </div>
               </div>
 
-              <IonRouterLink routerLink="/ai-debug">
-                <div className="setting-item">
-                  <div className="setting-header">
-                    <IonIcon icon={bulbOutline} />
-                    <div className="setting-content">
-                      <span>AI Assistant Debug</span>
-                    </div>
-                  </div>
-                </div>
-              </IonRouterLink>
-              
               <div className="setting-item logout-item">
                 <div className="setting-header">
                   <IonIcon icon={logOutOutline} />

@@ -9,181 +9,166 @@
 9        android:targetSdkVersion="35" />
 10
 11    <!-- Permissions -->
-12    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-12-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:40:5-71
-12-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:40:22-68
+12
 13    <uses-permission android:name="android.permission.INTERNET" />
-13-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:41:5-67
-13-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:41:22-64
-14    <uses-permission android:name="android.permission.CAMERA" />
-14-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:42:5-65
-14-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:42:22-62
-15    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-15-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:43:5-80
-15-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:43:22-77
-16    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-16-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:44:5-81
-16-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:44:22-78
+13-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:40:5-67
+13-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:40:22-64
+14    <uses-permission android:name="android.permission.VIBRATE" />
+14-->[:capacitor-haptics] C:\Users\admin\Desktop\SYNAPSE\synapse\node_modules\@capacitor\haptics\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-66
+14-->[:capacitor-haptics] C:\Users\admin\Desktop\SYNAPSE\synapse\node_modules\@capacitor\haptics\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-63
+15    <uses-permission android:name="android.permission.USE_BIOMETRIC" /> <!-- suppress DeprecatedClassUsageInspection -->
+15-->[androidx.biometric:biometric:1.1.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\eb1abcd433ebd6830d96edea1f30a050\transformed\biometric-1.1.0\AndroidManifest.xml:24:5-72
+15-->[androidx.biometric:biometric:1.1.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\eb1abcd433ebd6830d96edea1f30a050\transformed\biometric-1.1.0\AndroidManifest.xml:24:22-69
+16    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+16-->[androidx.biometric:biometric:1.1.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\eb1abcd433ebd6830d96edea1f30a050\transformed\biometric-1.1.0\AndroidManifest.xml:27:5-74
+16-->[androidx.biometric:biometric:1.1.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\eb1abcd433ebd6830d96edea1f30a050\transformed\biometric-1.1.0\AndroidManifest.xml:27:22-71
 17
-18    <queries>
-18-->[:capacitor-community-speech-recognition] C:\Users\admin\Desktop\SYNAPSE\synapse\node_modules\@capacitor-community\speech-recognition\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:5-13:15
-19        <intent>
-19-->[:capacitor-community-speech-recognition] C:\Users\admin\Desktop\SYNAPSE\synapse\node_modules\@capacitor-community\speech-recognition\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:9-12:18
-20            <action android:name="android.speech.RecognitionService" />
-20-->[:capacitor-community-speech-recognition] C:\Users\admin\Desktop\SYNAPSE\synapse\node_modules\@capacitor-community\speech-recognition\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-72
-20-->[:capacitor-community-speech-recognition] C:\Users\admin\Desktop\SYNAPSE\synapse\node_modules\@capacitor-community\speech-recognition\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:21-69
-21        </intent>
-22        <intent>
-22-->[:capacitor-camera] C:\Users\admin\Desktop\SYNAPSE\synapse\node_modules\@capacitor\camera\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-10:18
-23            <action android:name="android.media.action.IMAGE_CAPTURE" />
-23-->[:capacitor-camera] C:\Users\admin\Desktop\SYNAPSE\synapse\node_modules\@capacitor\camera\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-73
-23-->[:capacitor-camera] C:\Users\admin\Desktop\SYNAPSE\synapse\node_modules\@capacitor\camera\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:21-70
-24        </intent>
-25    </queries>
-26
-27    <uses-permission android:name="android.permission.VIBRATE" />
-27-->[:capacitor-haptics] C:\Users\admin\Desktop\SYNAPSE\synapse\node_modules\@capacitor\haptics\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-66
-27-->[:capacitor-haptics] C:\Users\admin\Desktop\SYNAPSE\synapse\node_modules\@capacitor\haptics\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-63
-28
-29    <permission
-29-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:22:5-24:47
-30        android:name="com.synapse.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-30-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:23:9-81
-31        android:protectionLevel="signature" />
-31-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:24:9-44
-32
-33    <uses-permission android:name="com.synapse.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-33-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:26:5-97
-33-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:26:22-94
-34
-35    <application
-35-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:4:5-37:19
-36        android:allowBackup="true"
-36-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:5:9-35
-37        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-37-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:28:18-86
-38        android:debuggable="true"
-39        android:extractNativeLibs="false"
-40        android:icon="@mipmap/ic_launcher"
-40-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:6:9-43
-41        android:label="@string/app_name"
-41-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:7:9-41
-42        android:roundIcon="@mipmap/ic_launcher_round"
-42-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:8:9-54
-43        android:supportsRtl="true"
-43-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:9:9-35
-44        android:testOnly="true"
-45        android:theme="@style/AppTheme" >
-45-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:10:9-40
-46        <activity
-46-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:12:9-26:20
-47            android:name="com.synapse.app.MainActivity"
-47-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:14:13-41
-48            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
-48-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:13:13-140
-49            android:exported="true"
-49-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:19:13-36
-50            android:label="@string/title_activity_main"
-50-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:15:13-56
-51            android:launchMode="singleTask"
-51-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:18:13-44
-52            android:theme="@style/AppTheme.NoActionBarLaunch"
-52-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:16:13-62
-53            android:windowSoftInputMode="adjustResize" >
-53-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:17:13-55
-54            <intent-filter>
-54-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:21:13-24:29
-55                <action android:name="android.intent.action.MAIN" />
-55-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:22:17-69
-55-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:22:25-66
-56
-57                <category android:name="android.intent.category.LAUNCHER" />
-57-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:23:17-77
-57-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:23:27-74
-58            </intent-filter>
-59        </activity>
-60
-61        <provider
-62            android:name="androidx.core.content.FileProvider"
-62-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:29:13-62
-63            android:authorities="com.synapse.app.fileprovider"
-63-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:30:13-64
-64            android:exported="false"
-64-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:31:13-37
-65            android:grantUriPermissions="true" >
-65-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:32:13-47
-66            <meta-data
-66-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:33:13-35:64
-67                android:name="android.support.FILE_PROVIDER_PATHS"
-67-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:34:17-67
-68                android:resource="@xml/file_paths" />
-68-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:35:17-51
-69        </provider>
-70        <provider
-70-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
-71            android:name="androidx.startup.InitializationProvider"
-71-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
-72            android:authorities="com.synapse.app.androidx-startup"
-72-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
-73            android:exported="false" >
-73-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
-74            <meta-data
-74-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
-75                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-75-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
-76                android:value="androidx.startup" />
-76-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
-77            <meta-data
-77-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\admin\.gradle\caches\8.11.1\transforms\2086035d7e747a32c2be40e6ed7f404e\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
-78                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-78-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\admin\.gradle\caches\8.11.1\transforms\2086035d7e747a32c2be40e6ed7f404e\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
-79                android:value="androidx.startup" />
-79-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\admin\.gradle\caches\8.11.1\transforms\2086035d7e747a32c2be40e6ed7f404e\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
-80            <meta-data
-80-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
-81                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-81-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
-82                android:value="androidx.startup" />
-82-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
-83        </provider>
-84
-85        <receiver
-85-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
-86            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-86-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
-87            android:directBootAware="false"
-87-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
-88            android:enabled="true"
-88-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
-89            android:exported="true"
-89-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
-90            android:permission="android.permission.DUMP" >
-90-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
-91            <intent-filter>
-91-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
-92                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-92-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
-92-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
-93            </intent-filter>
-94            <intent-filter>
-94-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
-95                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-95-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
-95-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
-96            </intent-filter>
-97            <intent-filter>
-97-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
-98                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-98-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
-98-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
-99            </intent-filter>
-100            <intent-filter>
-100-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
-101                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-101-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
-101-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
-102            </intent-filter>
-103        </receiver>
-104    </application>
-105
-106</manifest>
+18    <permission
+18-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:22:5-24:47
+19        android:name="com.synapse.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+19-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:23:9-81
+20        android:protectionLevel="signature" />
+20-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:24:9-44
+21
+22    <uses-permission android:name="com.synapse.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+22-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:26:5-97
+22-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:26:22-94
+23
+24    <application
+24-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:4:5-36:19
+25        android:allowBackup="true"
+25-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:5:9-35
+26        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+26-->[androidx.core:core:1.15.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\5f51ed623ec66baebfa6a053fe8a8b2a\transformed\core-1.15.0\AndroidManifest.xml:28:18-86
+27        android:debuggable="true"
+28        android:extractNativeLibs="false"
+29        android:icon="@mipmap/ic_launcher"
+29-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:6:9-43
+30        android:label="@string/app_name"
+30-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:7:9-41
+31        android:roundIcon="@mipmap/ic_launcher_round"
+31-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:8:9-54
+32        android:supportsRtl="true"
+32-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:9:9-35
+33        android:testOnly="true"
+34        android:theme="@style/AppTheme" >
+34-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:10:9-40
+35        <activity
+35-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:12:9-25:20
+36            android:name="com.synapse.app.MainActivity"
+36-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:14:13-41
+37            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
+37-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:13:13-140
+38            android:exported="true"
+38-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:18:13-36
+39            android:label="@string/title_activity_main"
+39-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:15:13-56
+40            android:launchMode="singleTask"
+40-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:17:13-44
+41            android:theme="@style/AppTheme.NoActionBarLaunch" >
+41-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:16:13-62
+42            <intent-filter>
+42-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:20:13-23:29
+43                <action android:name="android.intent.action.MAIN" />
+43-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:21:17-69
+43-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:21:25-66
+44
+45                <category android:name="android.intent.category.LAUNCHER" />
+45-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:22:17-77
+45-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:22:27-74
+46            </intent-filter>
+47        </activity>
+48
+49        <provider
+50            android:name="androidx.core.content.FileProvider"
+50-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:28:13-62
+51            android:authorities="com.synapse.app.fileprovider"
+51-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:29:13-64
+52            android:exported="false"
+52-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:30:13-37
+53            android:grantUriPermissions="true" >
+53-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:31:13-47
+54            <meta-data
+54-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:32:13-34:64
+55                android:name="android.support.FILE_PROVIDER_PATHS"
+55-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:33:17-67
+56                android:resource="@xml/file_paths" />
+56-->C:\Users\admin\Desktop\SYNAPSE\synapse\android\app\src\main\AndroidManifest.xml:34:17-51
+57        </provider>
+58        <provider
+58-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+59            android:name="androidx.startup.InitializationProvider"
+59-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+60            android:authorities="com.synapse.app.androidx-startup"
+60-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+61            android:exported="false" >
+61-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+62            <meta-data
+62-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+63                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+63-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+64                android:value="androidx.startup" />
+64-->[androidx.emoji2:emoji2:1.3.0] C:\Users\admin\.gradle\caches\8.11.1\transforms\455628e39230ce08b70f281b4ac99c3c\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+65            <meta-data
+65-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\admin\.gradle\caches\8.11.1\transforms\2086035d7e747a32c2be40e6ed7f404e\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
+66                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+66-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\admin\.gradle\caches\8.11.1\transforms\2086035d7e747a32c2be40e6ed7f404e\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
+67                android:value="androidx.startup" />
+67-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\admin\.gradle\caches\8.11.1\transforms\2086035d7e747a32c2be40e6ed7f404e\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
+68            <meta-data
+68-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+69                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+69-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+70                android:value="androidx.startup" />
+70-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+71        </provider>
+72
+73        <receiver
+73-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+74            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+74-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+75            android:directBootAware="false"
+75-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+76            android:enabled="true"
+76-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+77            android:exported="true"
+77-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+78            android:permission="android.permission.DUMP" >
+78-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+79            <intent-filter>
+79-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+80                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+80-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+80-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+81            </intent-filter>
+82            <intent-filter>
+82-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+83                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+83-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+83-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+84            </intent-filter>
+85            <intent-filter>
+85-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+86                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+86-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+86-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+87            </intent-filter>
+88            <intent-filter>
+88-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+89                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+89-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+89-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\0f3d68271fd414f74f11a6a9c308b287\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+90            </intent-filter>
+91        </receiver>
+92
+93        <service
+93-->[androidx.room:room-runtime:2.6.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\306dbe0c29ebe7db5878e236f08ceafe\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
+94            android:name="androidx.room.MultiInstanceInvalidationService"
+94-->[androidx.room:room-runtime:2.6.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\306dbe0c29ebe7db5878e236f08ceafe\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
+95            android:directBootAware="true"
+95-->[androidx.room:room-runtime:2.6.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\306dbe0c29ebe7db5878e236f08ceafe\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
+96            android:exported="false" />
+96-->[androidx.room:room-runtime:2.6.1] C:\Users\admin\.gradle\caches\8.11.1\transforms\306dbe0c29ebe7db5878e236f08ceafe\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
+97    </application>
+98
+99</manifest>
