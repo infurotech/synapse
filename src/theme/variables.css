@@ -106,22 +106,27 @@ http://ionicframework.com/docs/theming/ */
   /* Light Theme Background Colors */
   --ion-background-color: #F8F9FA;
   --ion-background-color-rgb: 248, 249, 250;
-  --ion-text-color: #2C3E50;
-  --ion-text-color-rgb: 44, 62, 80;
+  --ion-text-color: #1A1A1A;
+  --ion-text-color-rgb: 26, 26, 26;
 
-  /* Light Theme Warning Override */
-  --ion-color-warning: #F39C12;
-  --ion-color-warning-rgb: 243, 156, 18;
-  --ion-color-danger: #E74C3C;
-  --ion-color-danger-rgb: 231, 76, 60;
+  /* Light Theme Text Colors */
+  --text-primary: #1A1A1A;
+  --text-secondary: rgba(26, 26, 26, 0.8);
+  --text-muted: rgba(26, 26, 26, 0.6);
+
+  /* Light Theme Component Colors */
+  --ion-item-background: rgba(255, 255, 255, 0.9);
+  --ion-toolbar-background: rgba(255, 255, 255, 0.95);
+  --ion-tab-bar-background: rgba(255, 255, 255, 0.95);
+  --ion-card-background: rgba(255, 255, 255, 0.95);
 
   /* Light Theme Gradients */
   --cred-gradient-dark: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   --cred-gradient-card: linear-gradient(135deg, #ffffff 0%, #f1f3f4 100%);
   
   /* Light Theme Glass Morphism */
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.15);
   --glass-backdrop: blur(20px);
 
   /* Light Theme Shadows */
@@ -363,4 +368,104 @@ ion-toggle {
   :root {
     color-scheme: light;
   }
+}
+
+/* Light Theme Component Overrides */
+.light-theme ion-item {
+  --background: var(--ion-item-background);
+  --color: var(--text-primary);
+  --border-color: var(--glass-border);
+}
+
+.light-theme ion-card {
+  --background: var(--ion-card-background);
+  box-shadow: var(--shadow-card);
+}
+
+.light-theme ion-toolbar {
+  --background: var(--ion-toolbar-background);
+  --color: var(--text-primary);
+  --border-color: var(--glass-border);
+}
+
+.light-theme ion-tab-bar {
+  --background: var(--glass-bg);
+  --border-color: var(--glass-border);
+  border-top: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.light-theme ion-tab-button {
+  --color: var(--text-secondary);
+  --color-selected: var(--ion-color-primary);
+  --background: transparent;
+  --background-selected: rgba(108, 92, 231, 0.1);
+  --border-color: var(--glass-border);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  margin: 8px 4px;
+}
+
+.light-theme ion-tab-button:hover {
+  --background: rgba(108, 92, 231, 0.05);
+  border-color: var(--glass-border);
+}
+
+.light-theme ion-tab-button.tab-selected {
+  --background: rgba(108, 92, 231, 0.1);
+  border-color: var(--ion-color-primary);
+}
+
+.light-theme ion-input {
+  --background: var(--glass-bg);
+  --color: var(--text-primary);
+  --placeholder-color: var(--text-muted);
+  --border-color: var(--glass-border);
+}
+
+.light-theme ion-textarea {
+  --background: var(--glass-bg);
+  --color: var(--text-primary);
+  --placeholder-color: var(--text-muted);
+  --border-color: var(--glass-border);
+}
+
+.light-theme ion-select {
+  --background: var(--glass-bg);
+  --color: var(--text-primary);
+  --placeholder-color: var(--text-muted);
+  --border-color: var(--glass-border);
+}
+
+.light-theme ion-toggle {
+  --background: var(--glass-bg);
+  --background-checked: var(--ion-color-primary);
+  --handle-background: var(--ion-color-light);
+  --handle-background-checked: var(--ion-color-light);
+}
+
+/* Light Theme Text Overrides */
+.light-theme h1,
+.light-theme h2,
+.light-theme h3,
+.light-theme h4,
+.light-theme h5,
+.light-theme h6 {
+  color: var(--text-primary);
+}
+
+.light-theme p,
+.light-theme span,
+.light-theme label {
+  color: #1d1d2c;
+}
+
+.light-theme .text-muted {
+  color: var(--text-muted);
+}
+.light-theme .cred-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-card);
 }

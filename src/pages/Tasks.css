@@ -68,3 +68,40 @@
   font-weight: 500;
   flex-shrink: 0;
 } 
+
+
+/* Light theme overrides */
+.light-theme .tasks-content {
+  --background: var(--cred-gradient-dark);
+}
+
+.light-theme .tasks-section {
+  background: var(--ion-card-background);
+  border: 1px solid var(--glass-border);
+}
+
+.light-theme .section-title {
+  color: var(--text-primary);
+}
+
+.light-theme .task-item {
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.light-theme .task-content h2 {
+  color: var(--text-primary);
+}
+
+.light-theme .task-content p {
+  color: var(--text-secondary);
+}
+
+.light-theme .task-header ion-icon {
+  color: var(--ion-color-primary);
+}
+
+.light-theme ion-fab-button {
+  --background: var(--ion-color-primary);
+  --background-activated: var(--ion-color-primary-shade);
+  --color: white;
+}
