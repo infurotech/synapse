@@ -4,7 +4,7 @@ import { closeCircleOutline, attachOutline } from 'ionicons/icons';
 
 interface DocumentUploaderProps {
   onFileUpload?: (file: File) => void;
-  resetTrigger?: unknown; // Changing this prop will reset the attached file
+  resetTrigger?: unknown; 
 }
 
 const chipStyle: React.CSSProperties = {
@@ -25,7 +25,7 @@ const chipStyle: React.CSSProperties = {
   textOverflow: 'ellipsis',
   boxShadow: 'none',
   cursor: 'default',
-  flexShrink: 0  // Prevent chips from shrinking
+  flexShrink: 0  
 };
 
 const fileListContainerStyle: React.CSSProperties = {
@@ -41,8 +41,8 @@ const fileListContainerStyle: React.CSSProperties = {
   overflowY: 'hidden',
   gap: 0,
   zIndex: 2,
-  msOverflowStyle: 'none',  // IE
-  scrollbarWidth: 'none'    // Firefox
+  msOverflowStyle: 'none', 
+  scrollbarWidth: 'none'   
 };
 
 // Add a style tag for webkit scrollbar
@@ -58,28 +58,23 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onFileUpload, reset
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
-  // Reset attached files when resetTrigger changes
   useEffect(() => {
-    console.log('Reset trigger changed, clearing files');
     setAttachedFiles([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   }, [resetTrigger]);
 
-  //open file input from button click
   const handleButtonClick = () => {
     fileInputRef.current?.click();
   };
 
-  // when file is choose by user
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const newFiles = Array.from(files).filter(
         file => !attachedFiles.some(f => f.name === file.name && f.size === file.size)
       );
-      console.log('Adding new files:', newFiles.map(f => f.name));
       setAttachedFiles(prev => [...prev, ...newFiles]);
       if (onFileUpload) {
         newFiles.forEach(file => onFileUpload(file));
@@ -89,13 +84,11 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onFileUpload, reset
   };
 
   const handleRemoveFile = (index: number) => {
-    console.log('Removing file at index:', index);
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
     <>
-      {/* Upload button */}
       <div style={{ display: 'inline-flex', alignItems: 'center' }}>
         <IonButton fill="clear" onClick={handleButtonClick} className="upload-btn">
           <IonIcon icon={attachOutline} slot="icon-only" />
@@ -108,7 +101,6 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onFileUpload, reset
           multiple
         />
       </div>
-      {/* File chips row inside the message box */}
       {attachedFiles.length > 0 && (
         <div style={fileListContainerStyle} className="file-list-container">
           {attachedFiles.map((file, idx) => (
