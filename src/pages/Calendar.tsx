@@ -1,5 +1,4 @@
 import React, { useMemo, useState, useEffect } from 'react';
-
 import {
   IonContent,
   IonPage,
@@ -24,13 +23,8 @@ import {
 } from 'ionicons/icons';
 
 import './Calendar.css';
-
-type Event = {
-  title: string;
-  time: string;
-  location: string;
-  date: string;
-};
+import { CalendarHandler } from '../services/db/CalendarHandler';
+import { CalendarEvent } from '../services/db';
 
 const Calendar: React.FC = () => {
   const today = new Date();
@@ -41,22 +35,39 @@ const Calendar: React.FC = () => {
     month: today.getMonth(),
     year: today.getFullYear()
   });
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<CalendarEvent[]>([]);
+  const [eventDatesSet, setEventDatesSet] = useState<Set<string>>(new Set());
 
-  const events: Event[] = [
-    { title: 'Team Standup', time: '9:00 AM - 9:30 AM', location: 'Conference Room A', date: '5/6/2025' },
-    { title: 'Team Standup', time: '9:00 AM - 9:30 AM', location: 'Conference Room A', date: '5/6/2025' },
-    { title: 'Project Review', time: '2:00 PM - 3:00 PM', location: 'Virtual Meeting', date: '6/6/2025' },
-    { title: 'Project Review', time: '2:00 PM - 3:00 PM', location: 'Virtual Meeting', date: '10/6/2025' },
-    { title: 'Project Review', time: '2:00 PM - 3:00 PM', location: 'Virtual Meeting', date: '10/7/2025' },
-    { title: 'Project Review', time: '2:00 PM - 3:00 PM', location: 'Virtual Meeting', date: '10/7/2026' },
-  ];
+  const fetchEvents = async (date: Date) => {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const formattedDate = `${yyyy}-${mm}-${dd}`;
+    const handler = new CalendarHandler();
+    const events = await handler.getEventsByDate(formattedDate);
+    setFilteredEvents(events);
+  };
+
+  const fetchMonthEvents = async (year: number, month: number) => {
+    const handler = new CalendarHandler();
+    const events = await handler.getEventsForMonth(year, month + 1); // +1 since month is 0-indexed
+    const dateSet = new Set<string>();
+    events.forEach((event) => {
+      if (event.start_time) {
+        const d = new Date(event.start_time);
+        dateSet.add(d.getDate().toString());
+      }
+    });
+    setEventDatesSet(dateSet);
+  };
 
   useEffect(() => {
-    const currentDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-    const filtered = events.filter((event) => event.date === currentDate);
-    setFilteredEvents(filtered);
+    fetchEvents(today);
   }, []);
+
+  useEffect(() => {
+    fetchMonthEvents(currentYear, currentMonth);
+  }, [currentMonth, currentYear]);
 
   const handlePreviousMonth = () => {
     if (currentMonth === 0) {
@@ -87,11 +98,23 @@ const Calendar: React.FC = () => {
   const handleDateTask = (date: number | null) => {
     if (date !== null) {
       setHighlightedDate({ date, month: currentMonth, year: currentYear });
-      const selectedDate = `${date}/${currentMonth + 1}/${currentYear}`;
-      const filtered = events.filter((event) => event.date === selectedDate);
-      setFilteredEvents(filtered);
+      const selectedDate = new Date(currentYear, currentMonth, date);
+      fetchEvents(selectedDate);
     }
   };
+
+  const formatTime = (timeStr: string): string => {
+    const date = new Date(timeStr);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+    const minuteStr = minutes.toString().padStart(2, '0');
+
+    return `${hour12}:${minuteStr} ${ampm}`;
+  };
+
 
   const calendarDays = useMemo(() => {
     const firstDay = new Date(currentYear, currentMonth, 1);
@@ -135,8 +158,7 @@ const Calendar: React.FC = () => {
 
   const hasEvent = (date: number | null) => {
     if (date === null) return false;
-    const formattedDate = `${date}/${currentMonth + 1}/${currentYear}`;
-    return events.some(event => event.date === formattedDate);
+    return eventDatesSet.has(date.toString());
   };
 
   const monthNames = [
@@ -208,7 +230,6 @@ const Calendar: React.FC = () => {
                                 <span
                                   style={{
                                     position: 'absolute',
-                                    // bottom: 4,
                                     left: '50%',
                                     transform: 'translateX(-50%)',
                                     width: '4px',
@@ -238,7 +259,7 @@ const Calendar: React.FC = () => {
                   <div key={index} className="event-item">
                     <div className="event-content">
                       <h2>{event.title}</h2>
-                      <p><IonIcon icon={timeOutline} /> {event.time}</p>
+                      <p><IonIcon icon={timeOutline} /> {formatTime(event.start_time)} - {formatTime(event.end_time)}</p>
                       <p><IonIcon icon={locationOutline} /> {event.location}</p>
                     </div>
                   </div>
