@@ -82,7 +82,6 @@ const Dashboard: React.FC = () => {
 
   const handleSuggestionClick = (suggestion: string) => {
     setChatMessage(suggestion);
-    setIsFullPageChat(true);
   };
 
   const handleVoiceRecord = async () => {
