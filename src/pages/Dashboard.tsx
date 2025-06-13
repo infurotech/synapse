@@ -77,11 +77,14 @@ const Dashboard: React.FC = () => {
       setIsFullPageChat(true);
       console.log('Sending message:', chatMessage);
       setChatMessage('');
+      setIsRecording(false); // Reset recording state on new conversation
     }
   };
 
+
   const handleSuggestionClick = (suggestion: string) => {
     setChatMessage(suggestion);
+    setIsRecording(false); // Reset recording state when a suggestion is clicked
   };
 
   const handleVoiceRecord = async () => {
@@ -139,10 +142,12 @@ const Dashboard: React.FC = () => {
     console.log('Loading conversation:', conversation.title);
     setShowHistoryPopover(false);
     setIsFullPageChat(true);
+    setIsRecording(false);
   };
 
   const handleBackToChat = () => {
     setIsFullPageChat(false);
+    setIsRecording(false);
   };
 
   if (isFullPageChat) {
@@ -375,6 +380,9 @@ const Dashboard: React.FC = () => {
                     className={`action-button voice-btn ${isRecording ? 'recording' : ''}`}
                     onClick={handleVoiceRecord}
                   >
+                  <style>
+                    "background-color :rgb(51, 113, 163);"
+                  </style>
                     <IonIcon icon={micOutline} slot="icon-only" />
                   </IonButton>
                 </div>
@@ -438,4 +446,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

@@ -178,6 +178,36 @@ ion-toggle {
 }
 
 .light-theme .theme-select {
-  --background: rgba(0, 0, 0, 0.05);
-  --color: var(--text-primary);
+  --background: var(--glass-bg);
+  --color: var(--text-primary); 
+  border: 1px solid var(--glass-border);
+}
+
+.light-theme .setting-item {
+  --background: var(--ion-item-background);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.light-theme .setting-header ion-icon {
+  color: var(--ion-color-primary);
+}
+
+.light-theme .profile-settings {
+  --background: var(--ion-card-background);
+  box-shadow: var(--shadow-card);
+}
+
+.light-theme ion-toggle {
+  --background: var(--glass-bg);
+  --background-checked: var(--ion-color-primary);
+  --handle-background: var(--ion-color-light);
+  --handle-background-checked: var(--ion-color-light);
+}
+
+.light-theme .logout-item .setting-header ion-icon {
+  color: var(--ion-color-danger);
+}
+
+.light-theme .logout-item .setting-content span {
+  color: var(--ion-color-danger);
 } 

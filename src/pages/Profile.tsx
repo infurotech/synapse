@@ -138,6 +138,7 @@ const Profile: React.FC = () => {
                     <span>Logout</span>
                   </div>
                 </div>
+
               </div>
             </IonCardContent>
           </IonCard>
