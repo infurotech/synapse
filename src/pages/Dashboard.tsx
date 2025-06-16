@@ -4,6 +4,8 @@ import {
   IonContent,
   IonPage,
   IonIcon,
+  IonCard,
+  IonCardContent,
   IonButton,
   IonTextarea,
   IonPopover,
@@ -24,7 +26,16 @@ import {
 import { motion } from 'framer-motion';
 import './Dashboard.css';
 
-// Add interface for Conversation type
+
+
+interface Message {
+  id: number;
+  text: string;
+  files: File[];
+  isUser: boolean;
+  timestamp: Date;
+}
+
 interface Conversation {
   id: number;
   title: string;
@@ -38,13 +49,6 @@ interface Suggestion {
   icon: string;
 }
 
-interface Event {
-  id: number;
-  title: string;
-  time: string;
-  urgent: boolean;
-}
-
 const Dashboard: React.FC = () => {
   const [greeting, setGreeting] = useState('');
   
@@ -54,6 +58,8 @@ const Dashboard: React.FC = () => {
   const [isFullPageChat, setIsFullPageChat] = useState(false);
   const [showHistoryPopover, setShowHistoryPopover] = useState(false);
   const [resetUploader, setResetUploader] = useState(0);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([
     { id: 1, title: 'Meeting preparation tips', preview: 'Can you help me prepare for tomorrow\'s...', time: '2h ago' },
     { id: 2, title: 'Travel itinerary planning', preview: 'I need help planning my trip to...', time: '1d ago' },
@@ -79,32 +85,31 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const upcomingEvents: Event[] = [
+  const upcomingEvents =  [
     { id: 1, title: 'Team Meeting', time: '10:00 AM', urgent: true },
     { id: 2, title: 'Lunch with Sarah', time: '1:00 PM', urgent: false },
     { id: 3, title: 'Doctor Appointment', time: '3:30 PM', urgent: true },
   ];
 
-  const addNewConversation = (message: string) => {
-    setConversations(prev => [
-      {
-        id: prev.length + 1,
-        title: message.slice(0, 30) + '...',
-        preview: message,
-        time: 'Just now'
-      },
-      ...prev.slice(0, 4) // Keep only last 5 conversations
-    ]);
-  };
 
   const handleSendMessage = () => {
-    if (chatMessage.trim()) {
-      addNewConversation(chatMessage);
+
+    if (chatMessage.trim() || attachedFiles.length > 0) {
+      const newMessage: Message = {
+        id: Date.now(),
+        text: chatMessage.trim(),
+        files: [...attachedFiles],
+        isUser: true,
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, newMessage]);
       setIsFullPageChat(true);
-      console.log('Sending message:', chatMessage);
       setChatMessage('');
-      setResetUploader(prev => prev + 1); // Reset uploaded files
+      setAttachedFiles([]);
+      setResetUploader(prev => prev + 1);
     }
+
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -116,18 +121,15 @@ const Dashboard: React.FC = () => {
     // Here you would implement voice recording functionality
   };
 
-  const handleFileUpload = (file?: File) => {
-    // Optionally handle the uploaded file here
-    if (file) {
-      console.log('File uploaded:', file.name);
-    }
+  const handleFileUpload = (file: File) => {
+    setAttachedFiles(prev => [...prev, file]);
   };
 
   const handleHistoryClick = () => {
     setShowHistoryPopover(true);
   };
 
-  const handleConversationSelect = (conversation: Conversation) => {
+  const handleConversationSelect = (conversation: any) => {
     console.log('Loading conversation:', conversation.title);
     setShowHistoryPopover(false);
     setIsFullPageChat(true);
@@ -158,7 +160,6 @@ const Dashboard: React.FC = () => {
             </div>
             
             <div className="fullpage-messages">
-              {/* Chat messages would go here */}
               <div className="message-container">
                 <div className="user-message">
                   <p>Hello, how can I help you today?</p>
@@ -166,6 +167,25 @@ const Dashboard: React.FC = () => {
                 <div className="ai-message">
                   <p>I'm here to assist you with any questions or tasks you have. What would you like to work on?</p>
                 </div>
+
+                {messages.map((message) => (
+                  <div key={message.id} className="message-wrapper">
+                    {message.files.length > 0 && (
+                      <div className={`${message.isUser ? 'user-files' : 'ai-files'}`}>
+                        {message.files.map((file, index) => (
+                          <span key={index} className="file-chip">
+                            {file.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {message.text && (
+                      <div className={`${message.isUser ? 'user-message' : 'ai-message'}`}>
+                        <p>{message.text}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
             
@@ -187,12 +207,25 @@ const Dashboard: React.FC = () => {
                   >
                     <IonIcon icon={micOutline} slot="icon-only" />
                   </IonButton>
-                  <DocumentUploader onFileUpload={handleFileUpload} resetTrigger={resetUploader} />
-                  <IonButton
+                  {/* <DocumentUploader onFileUpload={handleFileUpload} resetTrigger={resetUploader} /> */}
+
+                  {/* <IonButton
                     fill="clear"
                     className={`fullpage-action-btn send-btn ${chatMessage.trim() ? 'active' : 'inactive'}`}
                     onClick={handleSendMessage}
                     disabled={!chatMessage.trim()}
+                  >
+                    <IonIcon icon={sendOutline} slot="icon-only" />
+                  </IonButton> */}
+
+                  <DocumentUploader onFileUpload={handleFileUpload} resetTrigger={resetUploader} /> 
+                  <IonButton
+                    fill="clear"
+                    // className={`fullpage-action-btn send-btn ${chatMessage.trim() ? 'active' : 'inactive'}`}
+                    className={`fullpage-action-btn send-btn ${(chatMessage.trim() || attachedFiles.length > 0) ? 'active' : 'inactive'}`}
+                    onClick={handleSendMessage}
+                    disabled={!chatMessage.trim() && attachedFiles.length === 0}
+                    // disabled={!chatMessage.trim()}
                   >
                     <IonIcon icon={sendOutline} slot="icon-only" />
                   </IonButton>
@@ -207,7 +240,8 @@ const Dashboard: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className="dashboard-content">
+      <IonContent scrollY={true} className="dashboard-content">
+      {/* <IonContent fullscreen className="dashboard-content"> */}
         <div className="dashboard-container">
           {/* Enhanced Greeting Section - Bigger without time */}
           <motion.div
@@ -313,6 +347,9 @@ const Dashboard: React.FC = () => {
           )}
         </div>
 
+        <div className="chat-footer-sticky">
+          <div className="chat-center-container">
+
         {/* AI Suggestions */}
         <div className="ai-suggestions">
           {suggestions.map((suggestion) => (
@@ -372,7 +409,8 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
-
+        </div>
+        </div>
         {/* History Popover */}
         <IonPopover
           isOpen={showHistoryPopover}
