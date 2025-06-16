@@ -1,0 +1,111 @@
+.calendar-content {
+  --background: var(--cred-gradient-dark);
+}
+
+.calendar-container {
+  padding: 16px;
+}
+
+.calendar-section,
+.events-section {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: white;
+  padding-left: 0;
+}
+
+.month-grid {
+  padding: 8px;
+}
+
+.month-grid ion-grid {
+  --ion-grid-padding: 0;
+}
+
+.weekdays {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+
+.month-grid ion-col {
+  text-align: center;
+  padding: 12px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  position: relative;
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.month-grid ion-col.today {
+  color: white;
+  font-weight: 600;
+}
+
+.month-grid ion-col.today::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  background-color: var(--ion-color-primary);
+  border-radius: 50%;
+  z-index: -1;
+}
+
+.event-item {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.event-item:last-child {
+  border-bottom: none;
+}
+
+.event-content {
+  width: 100%;
+}
+
+.event-content h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: white;
+}
+
+.event-content p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px 0;
+}
+
+.event-content p:last-child {
+  margin-bottom: 0;
+}
+
+.event-content p ion-icon {
+  font-size: 16px;
+  color: var(--ion-color-primary);
+  flex-shrink: 0;
+} 
