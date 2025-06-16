@@ -4,6 +4,7 @@ import { closeCircleOutline, attachOutline } from 'ionicons/icons';
 
 interface DocumentUploaderProps {
   onFileUpload?: (file: File) => void;
+  onFileRemove?: (file: File) => void;
   resetTrigger?: unknown; 
 }
 
@@ -54,7 +55,7 @@ styleSheet.textContent = `
 `;
 document.head.appendChild(styleSheet);
 
-const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onFileUpload, resetTrigger }) => {
+const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onFileUpload, onFileRemove, resetTrigger }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
@@ -84,7 +85,11 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onFileUpload, reset
   };
 
   const handleRemoveFile = (index: number) => {
+    const fileToRemove = attachedFiles[index];
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+    if (onFileRemove && fileToRemove) {
+      onFileRemove(fileToRemove);
+    }
   };
 
   return (

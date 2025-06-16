@@ -1234,38 +1234,3 @@
   height: auto;
   margin: 0;
 }
-
-.message-files {
-  display: flex;
-  white-space: nowrap;         
-  overflow: hidden;             
-  text-overflow: ellipsis;  
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.file-chip {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(108, 92, 231, 0.12);
-  border: 1px solid rgba(108, 92, 231, 0.25);
-  border-radius: 16px;
-  padding: 6px 12px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.user-message .file-chip {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.ai-message .file-chip {
-  background: rgba(108, 92, 231, 0.12);
-  border-color: rgba(108, 92, 231, 0.25);
-} 

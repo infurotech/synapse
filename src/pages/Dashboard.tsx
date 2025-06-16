@@ -163,6 +163,10 @@ const Dashboard: React.FC = () => {
     setAttachedFiles(prev => [...prev, file]);
   };
 
+  const handleFileRemove = (file: File) => {
+    setAttachedFiles(prev => prev.filter(f => f.name !== file.name || f.size !== file.size));
+  };
+
   
 
   const handleHistoryClick = () => {
@@ -247,25 +251,17 @@ const Dashboard: React.FC = () => {
                   >
                     <IonIcon icon={micOutline} slot="icon-only" />
                   </IonButton>
-                  {/* <DocumentUploader onFileUpload={handleFileUpload} resetTrigger={resetUploader} /> */}
 
-                  {/* <IonButton
-                    fill="clear"
-                    className={`fullpage-action-btn send-btn ${chatMessage.trim() ? 'active' : 'inactive'}`}
-                    onClick={handleSendMessage}
-                    disabled={!chatMessage.trim()}
-                  >
-                    <IonIcon icon={sendOutline} slot="icon-only" />
-                  </IonButton> */}
-
-                  <DocumentUploader onFileUpload={handleFileUpload} resetTrigger={resetUploader} /> 
+                  <DocumentUploader 
+                    onFileUpload={handleFileUpload} 
+                    onFileRemove={handleFileRemove}
+                    resetTrigger={resetUploader} 
+                  /> 
                   <IonButton
                     fill="clear"
-                    // className={`fullpage-action-btn send-btn ${chatMessage.trim() ? 'active' : 'inactive'}`}
                     className={`fullpage-action-btn send-btn ${(chatMessage.trim() || attachedFiles.length > 0) ? 'active' : 'inactive'}`}
                     onClick={handleSendMessage}
                     disabled={!chatMessage.trim() && attachedFiles.length === 0}
-                    // disabled={!chatMessage.trim()}
                   >
                     <IonIcon icon={sendOutline} slot="icon-only" />
                   </IonButton>
@@ -281,7 +277,6 @@ const Dashboard: React.FC = () => {
   return (
     <IonPage>
       <IonContent scrollY={true} className="dashboard-content">
-      {/* <IonContent fullscreen className="dashboard-content"> */}
         <div className="dashboard-container">
           {/* Enhanced Greeting Section - Bigger without time */}
           <motion.div
@@ -437,7 +432,11 @@ const Dashboard: React.FC = () => {
               </IonButton>
             </div>
             <div className="right-actions">
-              <DocumentUploader onFileUpload={handleFileUpload} resetTrigger={resetUploader} />
+              <DocumentUploader 
+                onFileUpload={handleFileUpload} 
+                onFileRemove={handleFileRemove}
+                resetTrigger={resetUploader} 
+              />
               <IonButton
                 fill="clear"
                 className={`action-button send-btn ${chatMessage.trim() ? 'active' : 'inactive'}`}
