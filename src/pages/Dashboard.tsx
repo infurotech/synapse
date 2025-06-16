@@ -26,8 +26,6 @@ import { isPlatform } from '@ionic/react';
 import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import './Dashboard.css';
 
-
-
 interface Message {
   id: number;
   text: string;
@@ -74,8 +72,6 @@ const Dashboard: React.FC = () => {
     { id: 4, text: 'What should I focus on?', icon: sparklesOutline }
   ]);
 
-
-
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('Good Morning');
@@ -91,7 +87,6 @@ const Dashboard: React.FC = () => {
     { id: 2, title: 'Lunch with Sarah', time: '1:00 PM', urgent: false },
     { id: 3, title: 'Doctor Appointment', time: '3:30 PM', urgent: true },
   ];
-
 
   const handleSendMessage = () => {
 
@@ -216,11 +211,18 @@ const Dashboard: React.FC = () => {
                   <div key={message.id} className="message-wrapper">
                     {message.files.length > 0 && (
                       <div className={`${message.isUser ? 'user-files' : 'ai-files'}`}>
-                        {message.files.map((file, index) => (
-                          <span key={index} className="file-chip">
-                            {file.name}
-                          </span>
-                        ))}
+                        {message.files.map((file, index) => {
+                          const fileName = file.name;
+                          const maxLength = 20;
+                          const displayName = fileName.length > maxLength 
+                            ? fileName.substring(0, maxLength) + '...' 
+                            : fileName;
+                          return (
+                            <span key={index} className="file-chip">
+                              {displayName}
+                            </span>
+                          );
+                        })}
                       </div>
                     )}
                     {message.text && (

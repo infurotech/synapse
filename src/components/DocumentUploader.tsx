@@ -46,7 +46,6 @@ const fileListContainerStyle: React.CSSProperties = {
   scrollbarWidth: 'none'   
 };
 
-// Add a style tag for webkit scrollbar
 const styleSheet = document.createElement('style');
 styleSheet.textContent = `
   .file-list-container::-webkit-scrollbar {
