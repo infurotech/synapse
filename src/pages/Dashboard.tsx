@@ -26,46 +26,7 @@ import { motion } from 'framer-motion';
 import { useWllama } from '../utils/wllama.context';
 import { nl2br } from '../utils/nl2br';
 import { useAgent, AgentStep } from '../agent/AgentService';
-import PerformanceMonitor from '../components/PerformanceMonitor';
 import './Dashboard.css';
-
-/*
-AGENT INTEGRATION SUMMARY:
-========================
-
-This Dashboard is now powered by an AI agent that can:
-
-1. RESPOND TO USER QUERIES: Uses internal reasoning for conversational responses
-2. CREATE TASKS: Can create tasks in your database with proper validation
-3. TOOL EXECUTION: Automatically calls appropriate tools based on user intent
-4. STREAMING RESPONSES: Shows real-time AI responses as they generate
-5. DATABASE INTEGRATION: All tasks are saved to your SQLite database
-
-TESTING EXAMPLES:
-================
-
-Try these prompts to test the agent:
-
-1. Simple conversations:
-   - "Hello, how are you?"
-   - "What can you help me with?"
-   - "Thank you for your help"
-
-2. Task creation:
-   - "Create a task to finish the project report with high priority"
-   - "Add a task: Call the dentist tomorrow, medium priority"
-   - "Make a task to review code with low priority due next Friday"
-
-3. Complex requests:
-   - "I need to create a high priority task for the presentation due Monday"
-   - "Can you help me add a task to buy groceries with medium priority?"
-
-The agent will automatically:
-- Choose the right tool (createTask vs respondToUser)
-- Validate task data (priority: high/medium/low)
-- Save to database
-- Provide helpful feedback
-*/
 
 interface ChatMessage {
   id: number;
@@ -93,7 +54,6 @@ const Dashboard: React.FC = () => {
   const [showHistoryPopover, setShowHistoryPopover] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [streamingMessageId, setStreamingMessageId] = useState<number | null>(null);
-  const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false);
   
   const { loadedModel, models, loadModel } = useWllama();
   const { processQuery, stopProcessing, isProcessing, isSystemBusy, modelState } = useAgent();
@@ -432,25 +392,7 @@ const Dashboard: React.FC = () => {
                 )}
               </div>
             </div>
-            
-            {/* Performance Monitor Button for Development */}
-            {process.env.NODE_ENV === 'development' && (
-              <div style={{ position: 'fixed', top: '80px', right: '20px', zIndex: 1000 }}>
-                <IonButton 
-                  fill="outline" 
-                  size="small"
-                  onClick={() => setShowPerformanceMonitor(true)}
-                  style={{ 
-                    '--border-color': 'rgba(255,255,255,0.3)',
-                    '--color': 'rgba(255,255,255,0.8)',
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  📊 Performance
-                </IonButton>
-              </div>
-            )}
-            
+                    
             <div className="fullpage-input-section">
               <div className="fullpage-chat-input">
                 <IonTextarea
@@ -723,11 +665,6 @@ const Dashboard: React.FC = () => {
             </div>
           </IonContent>
         </IonPopover>
-        
-        <PerformanceMonitor 
-          isVisible={showPerformanceMonitor}
-          onClose={() => setShowPerformanceMonitor(false)}
-        />
       </IonContent>
     </IonPage>
   );

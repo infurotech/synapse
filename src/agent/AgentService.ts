@@ -4,7 +4,7 @@ import { ToolExecutor } from './ToolExecutor';
 import { tools } from './tools';
 import { Task, Goal } from '../services/db/DatabaseSchema';
 import { MemoryManager } from './MemoryManager';
-import { AdvancedToolSystem } from './AdvancedToolSystem';
+
 
 // Configuration constants
 const CONFIG = {
@@ -218,9 +218,8 @@ export const useAgent = () => {
     }
   }, []);
 
-  // Initialize advanced systems
+  // Initialize memory manager
   const memoryManager = useMemo(() => MemoryManager.getInstance(), []);
-  const advancedToolSystem = useMemo(() => new AdvancedToolSystem(), []);
 
   // Removed debounced response formatting for better real-time updates
   
@@ -616,7 +615,10 @@ export const useAgent = () => {
           const stepPromises: Promise<void>[] = [];
           
           for (const step of steps) {
-            const stepKey = `${step.type}-${step.toolName || 'none'}-${step.id}`;
+            // Create deduplication key based on content, not unique ID
+            const stepKey = step.type === 'tool_call' && step.toolName && step.toolArgs
+              ? `${step.type}-${step.toolName}-${JSON.stringify(step.toolArgs)}`
+              : `${step.type}-${step.content.slice(0, 100)}-${step.id}`;
             
             if (processedSteps.has(stepKey)) continue;
             processedSteps.add(stepKey);
@@ -672,11 +674,7 @@ export const useAgent = () => {
           timestamp: new Date()
         });
 
-        // Log tool metrics for optimization
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[AgentService] Tool optimization suggestions:', 
-            advancedToolSystem.getToolOptimizationSuggestions());
-        }
+
 
         onComplete();
       } catch (error) {
@@ -686,7 +684,7 @@ export const useAgent = () => {
         setIsProcessing(false);
       }
     },
-    [loadedModel, createCompletion, buildPrompt, systemState.systemBusy, parseAgentResponse, executeAgentStep, formatResponseForDisplay, isLoadingModel, memoryManager, advancedToolSystem]
+    [loadedModel, createCompletion, buildPrompt, systemState.systemBusy, parseAgentResponse, executeAgentStep, formatResponseForDisplay, isLoadingModel, memoryManager]
   );
   
   return {

@@ -7,12 +7,6 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { 
-  flash, 
-  listOutline, 
-  calendarOutline, 
-  trendingUpOutline 
-} from 'ionicons/icons';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
