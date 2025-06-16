@@ -4,8 +4,6 @@ import {
   IonContent,
   IonPage,
   IonIcon,
-  IonCard,
-  IonCardContent,
   IonButton,
   IonTextarea,
   IonPopover,
@@ -24,6 +22,8 @@ import {
   flagOutline,
 } from 'ionicons/icons';
 import { motion } from 'framer-motion';
+import { isPlatform } from '@ionic/react';
+import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import './Dashboard.css';
 
 
@@ -53,14 +53,14 @@ const Dashboard: React.FC = () => {
   const [greeting, setGreeting] = useState('');
   
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [chatMessage, setChatMessage] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
   const [isFullPageChat, setIsFullPageChat] = useState(false);
   const [showHistoryPopover, setShowHistoryPopover] = useState(false);
   const [resetUploader, setResetUploader] = useState(0);
   const [messages, setMessages] = useState<Message[]>([]);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const [conversations, setConversations] = useState<Conversation[]>([
+  const [isRecording, setIsRecording] = useState(false);
+  const [chatMessage, setChatMessage] = useState('');
+  const [conversations] = useState<Conversation[]>([
     { id: 1, title: 'Meeting preparation tips', preview: 'Can you help me prepare for tomorrow\'s...', time: '2h ago' },
     { id: 2, title: 'Travel itinerary planning', preview: 'I need help planning my trip to...', time: '1d ago' },
     { id: 3, title: 'Project deadline management', preview: 'How can I better manage my project...', time: '3d ago' },
@@ -71,8 +71,9 @@ const Dashboard: React.FC = () => {
     { id: 1, text: 'Plan my day', icon: calendarOutline },
     { id: 2, text: 'Review upcoming tasks', icon: clipboardOutline },
     { id: 3, text: 'Give me insights', icon: bulbOutline },
-    { id: 4, text: 'What should I focus on?', icon: sparklesOutline },
+    { id: 4, text: 'What should I focus on?', icon: sparklesOutline }
   ]);
+
 
 
   useEffect(() => {
@@ -105,6 +106,7 @@ const Dashboard: React.FC = () => {
       
       setMessages(prev => [...prev, newMessage]);
       setIsFullPageChat(true);
+      console.log('Sending message:', chatMessage);
       setChatMessage('');
       setAttachedFiles([]);
       setResetUploader(prev => prev + 1);
@@ -116,20 +118,58 @@ const Dashboard: React.FC = () => {
     setChatMessage(suggestion);
   };
 
-  const handleVoiceRecord = () => {
-    setIsRecording(!isRecording);
-    // Here you would implement voice recording functionality
+  const handleVoiceRecord = async () => {
+    if (!isPlatform('android') && !isPlatform('ios')) {
+      alert('Speech recognition is only available on mobile devices.');
+      return;
+    }
+
+    if (!isRecording) {
+      setIsRecording(true);
+
+      const perm = await SpeechRecognition.requestPermissions();
+      if (perm.speechRecognition !== 'granted') {
+        alert('Microphone permission is required for speech recognition.');
+        setIsRecording(false);
+        return;
+      }
+
+      try {
+        const result = await SpeechRecognition.start({
+          language: 'en-US',
+          maxResults: 1,
+          prompt: 'Speak now',
+          partialResults: false,
+          popup: true,
+        });
+
+        if (result.matches && result.matches.length > 0) {
+          setChatMessage(result.matches[0]);
+        } else {
+          alert('No speech detected. Please try again.');
+        }
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        alert('Speech recognition error: ' + errorMessage);
+      }
+      setIsRecording(false);
+    } else {
+      setIsRecording(false);
+      await SpeechRecognition.stop();
+    }
   };
 
   const handleFileUpload = (file: File) => {
     setAttachedFiles(prev => [...prev, file]);
   };
 
+  
+
   const handleHistoryClick = () => {
     setShowHistoryPopover(true);
   };
 
-  const handleConversationSelect = (conversation: any) => {
+  const handleConversationSelect = (conversation: Conversation) => {
     console.log('Loading conversation:', conversation.title);
     setShowHistoryPopover(false);
     setIsFullPageChat(true);
