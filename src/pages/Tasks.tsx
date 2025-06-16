@@ -77,13 +77,7 @@ const Tasks: React.FC = () => {
 
           {/* AI Assistant */}
         </div>
-
-        {/* Floating action button to toggle AI Assistant */}
-        <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton onClick={() => setShowAI(!showAI)}>
-            <IonIcon icon={chatbubbleOutline} />
-          </IonFabButton>
-        </IonFab>
+        
       </IonContent>
     </IonPage>
   );

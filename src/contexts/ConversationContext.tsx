@@ -1,10 +1,14 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import { useDatabase } from './DatabaseContext';
+import { DatabaseService } from '../services/db';
 
+// UI Message interface - used in the React components
 export interface Message {
   id: string;
   content: string;
   sender: 'user' | 'ai';
   timestamp: Date;
+  mediaUrl?: string; // Optional media URL
 }
 
 export interface Conversation {
@@ -14,15 +18,25 @@ export interface Conversation {
   time: string;
   messages: Message[];
   lastUpdated: Date;
+  // Add any other fields from DB schema if needed for UI state
+}
+
+// Database Conversation interface - matches the database schema
+interface DBConversation {
+  id: number;
+  title: string;
+  last_message?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface ConversationContextType {
   conversations: Conversation[];
   currentConversation: Conversation | null;
-  addConversation: (conversation: Omit<Conversation, 'id' | 'time' | 'lastUpdated'>) => string;
-  updateConversation: (id: string, updates: Partial<Conversation>) => void;
-  selectConversation: (id: string) => void;
-  addMessageToConversation: (conversationId: string, message: Omit<Message, 'id' | 'timestamp'>) => void;
+  addConversation: (title: string) => Promise<Conversation>;
+  updateConversation: (id: string, updates: Partial<Conversation>) => Promise<void>;
+  selectConversation: (id: string) => Promise<void>;
+  addMessageToConversation: (conversationId: string, message: Omit<Message, 'id' | 'timestamp'>) => Promise<void>;
   generateTitle: (messages: Message[]) => string;
 }
 
@@ -37,37 +51,52 @@ export const useConversation = () => {
 };
 
 export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isReady: isDbReady } = useDatabase();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
 
-  // Load conversations from localStorage on initial load
+  // Load conversations from database on initial load or when db is ready
   useEffect(() => {
-    const savedConversations = localStorage.getItem('conversations');
-    if (savedConversations) {
-      try {
-        const parsed = JSON.parse(savedConversations);
-        // Convert string dates back to Date objects
-        const conversationsWithDates = parsed.map((conv: any) => ({
-          ...conv,
-          lastUpdated: new Date(conv.lastUpdated),
-          messages: conv.messages.map((msg: any) => ({
-            ...msg,
-            timestamp: new Date(msg.timestamp)
-          }))
-        }));
-        setConversations(conversationsWithDates);
-      } catch (error) {
-        console.error('Failed to parse saved conversations:', error);
+    const loadConversations = async () => {
+      if (isDbReady) {
+        try {
+          const db = DatabaseService.getInstance();
+          const dbConversations = await db.getConversations();
+          
+          // Transform DB conversations to UI conversations
+          const uiConversations = dbConversations.map(dbConv => {
+            // Transform messages from DB format to UI format
+            const messages = dbConv.messages.map(dbMsg => ({
+              id: dbMsg.id.toString(),
+              content: dbMsg.content,
+              sender: dbMsg.is_user_message === 1 ? 'user' : 'ai',
+              timestamp: new Date(dbMsg.created_at),
+              mediaUrl: dbMsg.media_url || undefined
+            }));
+            
+            const lastUpdated = new Date(dbConv.updated_at);
+            
+            return {
+              id: dbConv.id.toString(),
+              title: dbConv.title,
+              preview: dbConv.last_message || '',
+              time: getTimeString(lastUpdated),
+              messages: messages,
+              lastUpdated: lastUpdated
+            };
+          });
+          
+          setConversations(uiConversations as Conversation[]);
+          console.log('Conversations loaded from DB:', uiConversations.length);
+        } catch (error) {
+          console.error('Failed to load conversations from database:', error);
+        }
       }
-    }
-  }, []);
+    };
+    loadConversations();
+  }, [isDbReady]);
 
-  // Save conversations to localStorage whenever they change
-  useEffect(() => {
-    if (conversations.length > 0) {
-      localStorage.setItem('conversations', JSON.stringify(conversations));
-    }
-  }, [conversations]);
+
 
   const generateTitle = (messages: Message[]): string => {
     if (messages.length === 0) return "New Conversation";
@@ -91,117 +120,205 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return `${Math.floor(diffInSeconds / 604800)}w ago`;
   };
 
-  const addConversation = (conversation: Omit<Conversation, 'id' | 'time' | 'lastUpdated'>): string => {
+  const addConversation = useCallback(async (title: string) => {
     const now = new Date();
-    const id = `conv-${Date.now()}`;
-    const newConversation: Conversation = {
-      ...conversation,
-      id,
-      time: getTimeString(now),
-      lastUpdated: now
-    };
+    const nowISOString = now.toISOString();
     
-    setConversations(prev => [newConversation, ...prev]);
-    setCurrentConversation(newConversation);
-    return id;
-  };
-
-  const updateConversation = (id: string, updates: Partial<Conversation>) => {
-    setConversations(prev => 
-      prev.map(conv => 
-        conv.id === id 
-          ? { 
-              ...conv, 
-              ...updates, 
-              lastUpdated: new Date(),
-              time: getTimeString(new Date())
-            } 
-          : conv
-      )
-    );
-    
-    if (currentConversation?.id === id) {
-      setCurrentConversation(prev => 
-        prev ? { ...prev, ...updates, lastUpdated: new Date() } : null
-      );
+    try {
+      // Add to database
+      const db = DatabaseService.getInstance();
+      const dbConversation = {
+        user_id: 1, // TODO: Replace with actual user ID from authentication context
+        title,
+        last_message: '',
+        created_at: nowISOString,
+        updated_at: nowISOString
+      };
+      
+      const newConvId = await db.addConversation(dbConversation);
+      
+      // Create UI conversation object
+      const newConversation: Conversation = {
+        id: newConvId.toString(),
+        title,
+        preview: '',
+        time: getTimeString(now),
+        messages: [],
+        lastUpdated: now
+      };
+      
+      // Update state
+      setConversations(prev => [newConversation, ...prev]);
+      setCurrentConversation(newConversation);
+      return newConversation;
+    } catch (error) {
+      console.error('Failed to add conversation to database:', error);
+      throw error; // Re-throw the error to be handled by the caller
     }
-  };
+  }, []);
 
-  const selectConversation = (id: string) => {
-    const conversation = conversations.find(conv => conv.id === id);
-    if (conversation) {
-      setCurrentConversation(conversation);
-    }
-  };
-
-  const addMessageToConversation = (conversationId: string, message: Omit<Message, 'id' | 'timestamp'>) => {
-    const now = new Date();
-    const newMessage: Message = {
-      ...message,
-      id: `msg-${Date.now()}`,
-      timestamp: now
-    };
-
-    setConversations(prev => {
-      const updatedConversations = prev.map(conv => {
-        if (conv.id === conversationId) {
-          const updatedMessages = [...conv.messages, newMessage];
-          const preview = message.content.length > 40 
-            ? `${message.content.substring(0, 40)}...` 
-            : message.content;
-          
-          // If this is the first user message, generate a title
-          let title = conv.title;
-          if (conv.messages.length === 0 && message.sender === 'user') {
-            title = generateTitle([newMessage]);
-          }
-          
-          return {
-            ...conv,
-            messages: updatedMessages,
-            preview,
-            title,
-            lastUpdated: now,
-            time: getTimeString(now)
-          };
+  const updateConversation = useCallback(async (id: string, updates: Partial<Conversation>) => {
+    try {
+      const now = new Date();
+      const nowISOString = now.toISOString();
+      
+      // Map UI updates to database updates
+      const dbUpdates: Partial<DBConversation> = {
+        updated_at: nowISOString
+      };
+      
+      if (updates.title) dbUpdates.title = updates.title;
+      if (updates.preview) dbUpdates.last_message = updates.preview;
+      
+      // Update in database
+      const db = DatabaseService.getInstance();
+      await db.updateConversation(parseInt(id, 10), dbUpdates);
+      
+      // Update state with UI model updates
+      const uiUpdates = {
+        ...updates,
+        lastUpdated: now,
+        time: getTimeString(now)
+      };
+      
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === id) {
+          return { ...conv, ...uiUpdates };
         }
         return conv;
-      });
-      
-      // Move the updated conversation to the top of the list
-      const updatedConv = updatedConversations.find(c => c.id === conversationId);
-      const otherConvs = updatedConversations.filter(c => c.id !== conversationId);
-      
-      return updatedConv ? [updatedConv, ...otherConvs] : updatedConversations;
-    });
-    
-    // Update current conversation if it's the one we're adding to
-    if (currentConversation?.id === conversationId) {
-      setCurrentConversation(prev => {
-        if (!prev) return null;
-        
-        const updatedMessages = [...prev.messages, newMessage];
-        const preview = message.content.length > 40 
-          ? `${message.content.substring(0, 40)}...` 
-          : message.content;
-        
-        // If this is the first user message, generate a title
-        let title = prev.title;
-        if (prev.messages.length === 0 && message.sender === 'user') {
-          title = generateTitle([newMessage]);
-        }
-        
-        return {
-          ...prev,
-          messages: updatedMessages,
-          preview,
-          title,
-          lastUpdated: now,
-          time: getTimeString(now)
-        };
-      });
+      }));
+
+      // Update current conversation if it's the one being updated
+      if (currentConversation?.id === id) {
+        setCurrentConversation(prev => prev ? { ...prev, ...uiUpdates } : null);
+      }
+    } catch (error) {
+      console.error('Failed to update conversation in database:', error);
     }
-  };
+  }, [currentConversation]);
+
+  const selectConversation = useCallback(async (id: string) => {
+    try {
+      // Find the conversation in state
+      const conversation = conversations.find(c => c.id === id);
+      if (!conversation) {
+        console.error(`Conversation with id ${id} not found`);
+        return;
+      }
+      
+      // Get messages from database
+      const db = DatabaseService.getInstance();
+      const dbMessages = await db.getMessagesForConversation(parseInt(id));
+      
+      // Map database messages to UI messages
+      const uiMessages = dbMessages.map(dbMsg => ({
+        id: dbMsg.id.toString(),
+        content: dbMsg.content,
+        sender: dbMsg.is_user_message === 1 ? 'user' : 'ai',
+        timestamp: new Date(dbMsg.created_at),
+        mediaUrl: dbMsg.media_url
+      }));
+      
+      // Update the conversation with loaded messages
+      const updatedConversation = {
+        ...conversation,
+        messages: uiMessages
+      };
+      
+      // Set as current conversation
+      setCurrentConversation(updatedConversation as Conversation);
+      console.log(`Selected conversation ${id} with ${uiMessages.length} messages`);
+    } catch (error) {
+      console.error('Failed to load messages for conversation:', error);
+    }
+  }, [conversations]);
+
+  const addMessageToConversation = useCallback(async (conversationId: string, message: Omit<Message, 'id' | 'timestamp'>) => {
+    const timestamp = new Date();
+    const timestampISOString = timestamp.toISOString();
+    
+    try {
+      // Add to database
+      const db = DatabaseService.getInstance();
+      
+      // Create database message object
+      const dbMessage = {
+        conversation_id: parseInt(conversationId),
+        content: message.content,
+        media_url: message.mediaUrl,
+        is_user_message: message.sender === 'user' ? 1 : 0,
+        created_at: timestampISOString
+      };
+      
+      // Add message to database
+      const messageId = await db.addMessage(dbMessage);
+      
+      // Create UI message object
+      const newMessage: Message = {
+        id: messageId.toString(),
+        content: message.content,
+        sender: message.sender,
+        timestamp,
+        mediaUrl: message.mediaUrl
+      };
+      
+      // Find the conversation to update
+      const conversation = conversations.find(c => c.id === conversationId);
+      if (!conversation) {
+        console.error(`Conversation with id ${conversationId} not found`);
+        return;
+      }
+      
+      // Generate title if this is the first message and it's from the user
+      let title = conversation.title;
+      let dbTitle = title;
+      
+      if (conversation.messages.length === 0 && message.sender === 'user') {
+        title = generateTitle([newMessage]);
+        dbTitle = title;
+      }
+      
+      // Update conversation in database with last message and possibly new title
+      await db.updateConversation(parseInt(conversationId), {
+        last_message: message.content,
+        title: dbTitle,
+        updated_at: timestampISOString
+      });
+      
+      // Update conversations state
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === conversationId) {
+          const updatedConv = {
+            ...conv,
+            title,
+            messages: [...conv.messages, newMessage],
+            preview: message.content,
+            time: getTimeString(timestamp),
+            lastUpdated: timestamp
+          };
+          return updatedConv;
+        }
+        return conv;
+      }));
+
+      // Update current conversation if it's the one being updated
+      if (currentConversation?.id === conversationId) {
+        setCurrentConversation(prev => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            title,
+            messages: [...prev.messages, newMessage],
+            preview: message.content,
+            time: getTimeString(timestamp),
+            lastUpdated: timestamp
+          };
+        });
+      }
+    } catch (error) {
+      console.error('Failed to add message to database:', error);
+    }
+  }, [currentConversation, conversations]);
 
   const value = {
     conversations,
@@ -220,4 +337,4 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   );
 };
 
-export default ConversationContext; 
+export default ConversationContext;

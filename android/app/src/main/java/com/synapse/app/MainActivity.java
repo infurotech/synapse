@@ -10,6 +10,6 @@ public class MainActivity extends BridgeActivity {
     super.onCreate(savedInstanceState);
 
     // Register SQLite plugin
-    registerPlugin(CapacitorSQLitePlugin.class);
+    // registerPlugin(CapacitorSQLitePlugin.class);
   }
 }

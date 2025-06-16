@@ -25,6 +25,7 @@ import { motion } from 'framer-motion';
 import './Dashboard.css';
 import { useConversation } from '../contexts/ConversationContext';
 
+
 const Dashboard: React.FC = () => {
   const [greeting, setGreeting] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -85,25 +86,24 @@ const Dashboard: React.FC = () => {
         // Create a new conversation when sending from the Dashboard's main input
         setIsFullPageChat(true);
         
-        const newConversationId = addConversation({
-          title: "New Conversation",
-          preview: "",
-          messages: []
-        });
-        
-        // Add the user's message to the new conversation
-        addMessageToConversation(newConversationId, {
-          content: chatMessage,
-          sender: 'user'
-        });
-        
-        // Simulate AI response (in a real app, this would be from your AI service)
-        setTimeout(() => {
-          addMessageToConversation(newConversationId, {
-            content: `I'm here to help with "${chatMessage}". What would you like to know?`,
-            sender: 'ai'
+        // Create a new conversation
+        addConversation(`${chatMessage}`).then((newConversation) => {
+          // Add the user's message to the new conversation
+          addMessageToConversation(newConversation.id, {
+            content: chatMessage,
+            sender: 'user'
           });
-        }, 1000);
+          
+          // Simulate AI response (in a real app, this would be from your AI service)
+          setTimeout(() => {
+            addMessageToConversation(newConversation.id, {
+              content: `I'm here to help with "${chatMessage}". What would you like to know?`,
+              sender: 'ai'
+            });
+          }, 1000);
+        });
+        
+
       }
       
       setChatMessage('');
@@ -430,4 +430,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

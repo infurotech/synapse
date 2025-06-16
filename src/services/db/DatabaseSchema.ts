@@ -64,6 +64,7 @@ export interface Goal {
 // Conversation schema
 export interface Conversation {
   id: number;
+  user_id: number;
   title: string;
   last_message?: string;
   created_at: string;
@@ -106,4 +107,4 @@ export const Schema = {
   // Add other non-type exports here if needed
 };
 
-export default Schema; 
+export default Schema;

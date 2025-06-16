@@ -1,8 +1,9 @@
 import { Capacitor } from '@capacitor/core';
 import { SQLiteConnection, SQLiteDBConnection, CapacitorSQLite } from '@capacitor-community/sqlite';
+import { Conversation as DBConversation, Message as DBMessage } from './DatabaseSchema';
 
-export class DatabaseAgent {
-  private static instance: DatabaseAgent;
+export class DatabaseService {
+  private static instance: DatabaseService;
   private sqlite: SQLiteConnection;
   private db: SQLiteDBConnection | null = null;
   private isInitialized = false;
@@ -13,11 +14,11 @@ export class DatabaseAgent {
     this.sqlite = new SQLiteConnection(CapacitorSQLite);
   }
 
-  public static getInstance(): DatabaseAgent {
-    if (!DatabaseAgent.instance) {
-      DatabaseAgent.instance = new DatabaseAgent();
+  public static getInstance(): DatabaseService {
+    if (!DatabaseService.instance) {
+      DatabaseService.instance = new DatabaseService();
     }
-    return DatabaseAgent.instance;
+    return DatabaseService.instance;
   }
 
   /**
@@ -156,10 +157,12 @@ export class DatabaseAgent {
     await this.db.execute(`
       CREATE TABLE IF NOT EXISTS conversations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
         title TEXT NOT NULL,
         last_message TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       );
     `);
 
@@ -189,31 +192,96 @@ export class DatabaseAgent {
     try {
       console.log('Testing database connection...');
       
-      // Insert a test user
-      const testEmail = `test_${Date.now()}@example.com`;
-      const insertQuery = `
-        INSERT INTO users (email, theme_preference)
-        VALUES (?, ?)
-      `;
-      const values = [testEmail, 'system'];
-      await this.db.run(insertQuery, values);
+      // Insert a test user if no users exist
+      const userCountResult = await this.db.query('SELECT COUNT(*) as count FROM users;');
+      if (userCountResult.values && userCountResult.values[0].count === 0) {
+        const testEmail = `test_${Date.now()}@example.com`;
+        const insertQuery = `
+          INSERT INTO users (email, theme_preference)
+          VALUES (?, ?) 
+        `;
+        const values = [testEmail, 'system'];
+        await this.db.run(insertQuery, values);
       
-      console.log(`Inserted test user with email: ${testEmail}`);
       
-      // Query the test user
-      const selectQuery = `
-        SELECT * FROM users WHERE email = ?
-      `;
-      const result = await this.db.query(selectQuery, [testEmail]);
-      
-      if (result.values && result.values.length > 0) {
-        console.log('Test user retrieved successfully:', result.values[0]);
+      // Retrieve the inserted user
+      const selectQuery = `SELECT * FROM users WHERE email = ?`;
+      const res = await this.db.query(selectQuery, [testEmail]);
+      if (res.values && res.values.length > 0) {
+        console.log('Test user retrieved:', res.values[0]);
       } else {
-        console.error('Failed to retrieve test user');
+        console.warn('Test user not found after insertion.');
       }
-    } catch (error) {
-      console.error('Database test failed:', error);
+
+      // Clean up: delete the test user
+      const deleteQuery = `DELETE FROM users WHERE email = ?`;
+      await this.db.run(deleteQuery, [testEmail]);
+      console.log('Test user deleted.');
+
+      console.log('Database connection test successful.');
+    } }catch (error) {
+      console.error('Database connection test failed:', error);
+      throw error;
     }
+  }
+  
+
+  public async addConversation(conversation: Omit<DBConversation, 'id'>): Promise<number> {
+    if (!this.db) throw new Error('Database not initialized');
+    const { user_id, title, last_message, created_at, updated_at } = conversation;
+    const query = `INSERT INTO conversations (user_id, title, last_message, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`;
+    const res = await this.db.run(query, [user_id, title, last_message, created_at, updated_at]);
+    if (res.changes?.lastId === undefined) throw new Error('Failed to get last inserted ID');
+    return res.changes.lastId;
+  }
+
+  public async updateConversation(id: number, updates: Partial<Omit<DBConversation, 'id'>>): Promise<void> {
+    if (!this.db) throw new Error('Database not initialized');
+    const setClauses = Object.keys(updates).map(key => `${key} = ?`).join(', ');
+    const values = Object.values(updates);
+    const query = `UPDATE conversations SET ${setClauses} WHERE id = ?`;
+    await this.db.run(query, [...values, id]);
+  }
+
+  public async addMessage(message: Omit<DBMessage, 'id'>): Promise<number> {
+    if (!this.db) throw new Error('Database not initialized');
+    const { conversation_id, content, media_url, is_user_message, created_at } = message;
+    const query = `INSERT INTO messages (conversation_id, content, media_url, is_user_message, created_at) VALUES (?, ?, ?, ?, ?)`;
+    const res = await this.db.run(query, [conversation_id, content, media_url, is_user_message, created_at]);
+    if (res.changes?.lastId === undefined) throw new Error('Failed to get last inserted ID');
+    return res.changes.lastId;
+  }
+
+  public async getConversations(): Promise<Array<DBConversation & { messages: DBMessage[] }>> {
+    if (!this.db) throw new Error('Database not initialized');
+    const conversationsQuery = `SELECT * FROM conversations ORDER BY updated_at DESC`;
+    const conversationsRes = await this.db.query(conversationsQuery);
+    
+    if (!conversationsRes.values) return [];
+
+    const conversationsWithMessages: Array<DBConversation & { messages: DBMessage[] }> = [];
+
+    for (const conv of conversationsRes.values as DBConversation[]) {
+      const messagesQuery = `SELECT * FROM messages WHERE conversation_id = ? ORDER BY created_at ASC`;
+      const messagesRes = await this.db.query(messagesQuery, [conv.id]);
+      const messages = messagesRes.values ? (messagesRes.values as DBMessage[]) : [];
+      conversationsWithMessages.push({ ...conv, messages });
+    }
+
+    return conversationsWithMessages;
+  }
+
+  public async getMessagesForConversation(conversationId: number): Promise<DBMessage[]> {
+    if (!this.db) throw new Error('Database not initialized');
+    const query = `SELECT * FROM messages WHERE conversation_id = ? ORDER BY created_at ASC`;
+    const res = await this.db.query(query, [conversationId]);
+    return res.values ? (res.values as DBMessage[]) : [];
+  }
+
+  public async deleteConversation(conversationId: number): Promise<void> {
+    if (!this.db) throw new Error('Database not initialized');
+    const query = `DELETE FROM conversations WHERE id =?`;
+    await this.db.run(query, [conversationId]);
   }
 
   /**
@@ -235,4 +303,4 @@ export class DatabaseAgent {
   }
 }
 
-export default DatabaseAgent;   
+export default DatabaseService;
