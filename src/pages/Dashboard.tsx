@@ -5,7 +5,6 @@ import {
   IonIcon,
   IonButton,
   IonTextarea,
-  IonPopover,
 } from '@ionic/react';
 import {
   micOutline,
@@ -24,6 +23,7 @@ import {
 import { motion } from 'framer-motion';
 import './Dashboard.css';
 import { useConversation } from '../contexts/ConversationContext';
+import RecentConversations from '../components/RecentConversations';
 
 
 const Dashboard: React.FC = () => {
@@ -395,36 +395,11 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* History Popover */}
-        <IonPopover
+        <RecentConversations
           isOpen={showHistoryPopover}
           onDidDismiss={() => setShowHistoryPopover(false)}
-          trigger="history-trigger"
-          className="history-popover"
-        >
-          <IonContent className="history-popover-content">
-            <div className="history-popover-header">
-              <h3>Recent Conversations</h3>
-            </div>
-            <div className="history-conversation-list">
-              {conversations.map((conversation) => (
-                <div 
-                  key={conversation.id} 
-                  className="history-conversation-item"
-                  onClick={() => handleConversationSelect(conversation.id)}
-                >
-                  <div className="history-conversation-content">
-                    <h4 className="history-conversation-title">{conversation.title}</h4>
-                    <p className="history-conversation-preview">{conversation.preview}</p>
-                  </div>
-                  <div className="history-conversation-meta">
-                    <span className="history-conversation-time">{conversation.time}</span>
-                    <IonIcon icon={chevronForwardOutline} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </IonContent>
-        </IonPopover>
+          onConversationSelect={handleConversationSelect}
+        />
       </IonContent>
     </IonPage>
   );

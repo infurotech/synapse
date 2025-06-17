@@ -1,110 +1,14 @@
-.recent-conversations {
-  width: 100%;
-  background-color: var(--ion-card-background, #ffffff);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  margin-bottom: 16px;
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .history-popover {
+    --width: 500px;
+    --height: 400px;
+  }
 }
 
-.recent-conversations-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.recent-conversations-header h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--ion-text-color, #333333);
-}
-
-.see-all-btn {
-  font-size: 14px;
-  --color: var(--ion-color-primary);
-  font-weight: 500;
-  margin: 0;
-  --padding-start: 8px;
-  --padding-end: 8px;
-}
-
-.conversation-list {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.conversation-item {
-  display: flex;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.conversation-item:last-child {
-  border-bottom: none;
-}
-
-.conversation-item:hover {
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-.conversation-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.conversation-title {
-  margin: 0 0 4px 0;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--ion-text-color, #333333);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.conversation-preview {
-  margin: 0;
-  font-size: 13px;
-  color: var(--ion-color-medium, #92949c);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.conversation-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: space-between;
-  min-width: 60px;
-  margin-left: 12px;
-}
-
-.conversation-time {
-  font-size: 12px;
-  color: var(--ion-color-medium, #92949c);
-}
-
-.conversation-meta ion-icon {
-  font-size: 16px;
-  color: var(--ion-color-medium, #92949c);
-}
-
-.no-conversations {
-  padding: 24px;
-  text-align: center;
-  color: var(--ion-color-medium, #92949c);
-  font-size: 14px;
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-  .conversation-item:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+@media (min-width: 1024px) {
+  .history-popover {
+    --width: 600px;
+    --height: 500px;
   }
 } 
