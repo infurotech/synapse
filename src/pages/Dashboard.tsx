@@ -5,7 +5,6 @@ import {
   IonIcon,
   IonButton,
   IonTextarea,
-  IonPopover,
 } from '@ionic/react';
 import {
   micOutline,
@@ -13,7 +12,6 @@ import {
   attachOutline,
   personOutline,
   timeOutline,
-  chevronForwardOutline,
   sparklesOutline,
   calendarOutline,
   clipboardOutline,
@@ -24,9 +22,11 @@ import {
 } from 'ionicons/icons';
 import { motion } from 'framer-motion';
 import { useWllama } from '../utils/wllama.context';
-import { nl2br } from '../utils/nl2br';
+import { formatText } from '../utils/nl2br';
 import { useAgent, AgentStep } from '../agent/AgentService';
+import AgentThinking from '../components/AgentThinking';
 import './Dashboard.css';
+import './Dashboard-thinking.css';
 
 interface ChatMessage {
   id: number;
@@ -38,43 +38,23 @@ interface ChatMessage {
   isToolResult?: boolean;
 }
 
-interface Conversation {
-  id: number;
-  title: string;
-  preview: string;
-  time: string;
-}
-
 const Dashboard: React.FC = () => {
   const [greeting, setGreeting] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [chatMessage, setChatMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isFullPageChat, setIsFullPageChat] = useState(false);
-  const [showHistoryPopover, setShowHistoryPopover] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [streamingMessageId, setStreamingMessageId] = useState<number | null>(null);
   
   const { loadedModel, models, loadModel } = useWllama();
   const { processQuery, stopProcessing, isProcessing, isSystemBusy, modelState } = useAgent();
   
-  const [currentAgentResponse, setCurrentAgentResponse] = useState('');
+  const [, setCurrentAgentResponse] = useState('');
   const [agentSteps, setAgentSteps] = useState<AgentStep[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Helper function to build context from recent messages
-  const buildConversationContext = (messages: ChatMessage[]): string | undefined => {
-    if (messages.length <= 1) return undefined;
-    
-    // Get last 4 messages for context (excluding current user message)
-    const recentMessages = messages.slice(-4);
-    return recentMessages
-      .map(m => `${m.role}: ${m.content}`)
-      .join('\n');
-  };
-
-  // Helper function to create tool result message
   const createToolResultMessage = (step: AgentStep): ChatMessage => {
     return {
       id: Date.now() + Math.random(),
@@ -86,13 +66,6 @@ const Dashboard: React.FC = () => {
       isToolResult: true,
     };
   };
-
-  const [conversations] = useState<Conversation[]>([
-    { id: 1, title: 'Meeting preparation tips', preview: 'Can you help me prepare for tomorrow\'s...', time: '2h ago' },
-    { id: 2, title: 'Travel itinerary planning', preview: 'I need help planning my trip to...', time: '1d ago' },
-    { id: 3, title: 'Project deadline management', preview: 'How can I better manage my project...', time: '3d ago' },
-    { id: 4, title: 'Email writing assistance', preview: 'Help me draft a professional email...', time: '1w ago' },
-  ]);
 
   const [suggestions] = useState([
     { id: 1, text: 'Create a high priority task for my project', icon: clipboardOutline },
@@ -123,9 +96,8 @@ const Dashboard: React.FC = () => {
         if (chatModel) {
           try {
             await loadModel(chatModel);
-            console.log('Chat model loaded successfully');
-          } catch (error) {
-            console.error('Failed to load chat model:', error);
+          } catch {
+            // Model loading will be handled by the UI state
           }
         }
       }
@@ -138,6 +110,8 @@ const Dashboard: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
+
+
   const upcomingEvents = [
     { id: 1, title: 'Team Meeting', time: '10:00 AM', urgent: true },
     { id: 2, title: 'Lunch with Sarah', time: '1:00 PM', urgent: false },
@@ -148,16 +122,12 @@ const Dashboard: React.FC = () => {
     if (!chatMessage.trim()) return;
 
     if (!modelState.loaded) {
-      console.log('No model loaded - please wait for model to load');
       return;
     }
 
     if (isSystemBusy) {
-      console.log('System is busy - please wait');
       return;
     }
-
-    console.log('🚀 [Dashboard] Starting agent-powered chat with message:', chatMessage);
 
     setIsFullPageChat(true);
     
@@ -188,15 +158,9 @@ const Dashboard: React.FC = () => {
       setChatMessages(prev => [...prev, initialAssistantMessage]);
       setStreamingMessageId(assistantMessageId);
       
-      console.log('🤖 [Dashboard] Calling agent processQuery...');
-      
-      // Build context from previous messages
-      const context = buildConversationContext([...chatMessages, userMessage]);
-      
       await processQuery(
         currentUserMessage,
         (text: string) => {
-          console.log('📝 [Dashboard] Agent response update, length:', text.length);
           setCurrentAgentResponse(text);
           setChatMessages(prev => 
             prev.map(msg => 
@@ -207,7 +171,6 @@ const Dashboard: React.FC = () => {
           );
         },
         (error: Error) => {
-          console.error('❌ [Dashboard] Agent processing error:', error);
           setChatMessages(prev => 
             prev.map(msg => 
               msg.id === assistantMessageId 
@@ -218,33 +181,30 @@ const Dashboard: React.FC = () => {
           setStreamingMessageId(null);
           setCurrentAgentResponse('');
         },
-        () => {
-          console.log('✅ [Dashboard] Agent processing completed');
+        async () => {
           setStreamingMessageId(null);
         },
         (step: AgentStep) => {
-          console.log('🔧 [Dashboard] Agent step:', step.type, step.content?.substring(0, 50) + '...');
-          setAgentSteps(prev => [...prev, step]);
+          // Filter out tool_result steps from main thinking display as they create separate messages
+          if (step.type !== 'tool_result') {
+            setAgentSteps(prev => {
+              // Deduplicate steps by ID to avoid showing duplicates during streaming
+              const existingIds = new Set(prev.map(s => s.id));
+              if (!existingIds.has(step.id)) {
+                return [...prev, step];
+              }
+              return prev;
+            });
+          }
           
-          // Handle tool results by creating separate messages
           if (step.type === 'tool_result') {
-            console.log('🛠️ [Dashboard] Tool result:', step.toolName, step.content);
             const toolResultMessage = createToolResultMessage(step);
             setChatMessages(prev => [...prev, toolResultMessage]);
           }
-          
-          // Handle thoughts and tool calls for debugging (optional)
-          if (step.type === 'thought') {
-            console.log('💭 [Dashboard] Agent thinking:', step.content);
-          } else if (step.type === 'tool_call') {
-            console.log('🔧 [Dashboard] Tool call:', step.toolName, step.toolArgs);
-          }
-        },
-        context
+        }
       );
       
-    } catch (error) {
-      console.error('💥 [Dashboard] Chat completion error:', error);
+    } catch {
       setStreamingMessageId(null);
       setCurrentAgentResponse('');
     }
@@ -260,18 +220,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleFileUpload = () => {
-    // Here you would implement file upload functionality
-    console.log('File upload clicked');
-  };
-
-  const handleHistoryClick = () => {
-    setShowHistoryPopover(true);
-  };
-
-  const handleConversationSelect = (conversation: Conversation) => {
-    console.log('Loading conversation:', conversation.title);
-    setShowHistoryPopover(false);
-    setIsFullPageChat(true);
+    // File upload functionality to be implemented
   };
 
   const handleBackToChat = () => {
@@ -279,7 +228,6 @@ const Dashboard: React.FC = () => {
   };
 
   const handleStopGeneration = () => {
-    console.log('🛑 [Dashboard] Stop generation requested');
     stopProcessing();
     setStreamingMessageId(null);
   };
@@ -300,17 +248,6 @@ const Dashboard: React.FC = () => {
               <div className="fullpage-title">
                 <img src="logo-white.png" alt="Synapse Logo" style={{width: '20px', height: '20px'}} />
                 <span>Synapse AI</span>
-                {isProcessing && <span className="agent-status"> • Processing...</span>}
-                {modelState.loaded && !isProcessing && (
-                  <span className="model-status" style={{ 
-                    fontSize: '0.7rem', 
-                    opacity: 0.7, 
-                    marginLeft: '8px',
-                    color: 'var(--ion-color-success)' 
-                  }}>
-                    • Ready
-                  </span>
-                )}
               </div>
             </div>
             
@@ -325,24 +262,35 @@ const Dashboard: React.FC = () => {
                 ) : (
                   <>
                     {chatMessages.map((message) => (
-                      <div key={message.id} className={`${message.role}-message ${message.id === streamingMessageId ? 'streaming' : ''} ${message.isToolResult ? 'tool-result' : ''}`}>
-                        {message.isToolResult && (
-                          <div className="tool-indicator">
-                            <span>🔧 {message.toolName}</span>
-                          </div>
+                      <div key={message.id}>
+                        {/* Show thinking panel for assistant messages when processing */}
+                        {message.role === 'assistant' && message.id === streamingMessageId && agentSteps.length > 0 && (
+                          <AgentThinking 
+                            steps={agentSteps} 
+                            isProcessing={isProcessing}
+                            isCollapsible={true}
+                          />
                         )}
-                        {message.role === 'assistant' && message.id === streamingMessageId && !message.content && isProcessing ? (
-                          <div className="thinking-indicator">
-                            <span>🤔 Thinking and using tools...</span>
-                            <div className="typing-dots">
-                              <div></div>
-                              <div></div>
-                              <div></div>
+                        
+                        <div className={`${message.role}-message ${message.id === streamingMessageId ? 'streaming' : ''} ${message.isToolResult ? 'tool-result' : ''}`}>
+                          {message.isToolResult && (
+                            <div className="tool-indicator">
+                              <span>🔧 {message.toolName}</span>
                             </div>
-                          </div>
-                        ) : (
-                          <p>{message.role === 'assistant' ? nl2br(message.content) : message.content}</p>
-                        )}
+                          )}
+                          {message.role === 'assistant' && message.id === streamingMessageId && !message.content && isProcessing ? (
+                            <div className="thinking-indicator">
+                              <span>🤔 Thinking and using tools...</span>
+                              <div className="typing-dots">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                              </div>
+                            </div>
+                          ) : (
+                            <p>{formatText(message.content)}</p>
+                          )}
+                        </div>
                       </div>
                     ))}
                     
@@ -354,36 +302,6 @@ const Dashboard: React.FC = () => {
                           <div></div>
                           <div></div>
                         </div>
-                      </div>
-                    )}
-
-                    {/* Debug Panel - Development Only */}
-                    {process.env.NODE_ENV === 'development' && agentSteps.length > 0 && (
-                      <div className="agent-debug-panel" style={{
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '8px',
-                        padding: '12px',
-                        margin: '8px 0',
-                        fontSize: '0.8rem',
-                        color: 'rgba(255, 255, 255, 0.7)'
-                      }}>
-                        <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
-                          🔧 Agent Steps ({agentSteps.length}):
-                        </div>
-                        {agentSteps.slice(-3).map((step, index) => (
-                          <div key={index} style={{ marginBottom: '4px' }}>
-                            <span style={{ color: 'var(--ion-color-primary)' }}>
-                              {step.type.toUpperCase()}:
-                            </span> {step.content?.substring(0, 100)}
-                            {step.content && step.content.length > 100 ? '...' : ''}
-                          </div>
-                        ))}
-                        {currentAgentResponse && (
-                          <div style={{ marginTop: '8px', fontSize: '0.7rem' }}>
-                            <strong>Response Length:</strong> {currentAgentResponse.length} chars
-                          </div>
-                        )}
                       </div>
                     )}
                     
@@ -582,14 +500,7 @@ const Dashboard: React.FC = () => {
               
               <div className="chat-actions-row">
                 <div className="left-actions">
-                  <IonButton
-                    fill="clear"
-                    className="action-button history-btn"
-                    onClick={handleHistoryClick}
-                    id="history-trigger"
-                  >
-                    <IonIcon icon={timeOutline} slot="icon-only" />
-                  </IonButton>
+
                 </div>
 
                 <div className="middle-actions">
@@ -635,36 +546,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <IonPopover
-          isOpen={showHistoryPopover}
-          onDidDismiss={() => setShowHistoryPopover(false)}
-          trigger="history-trigger"
-          className="history-popover"
-        >
-          <IonContent className="history-popover-content">
-            <div className="history-popover-header">
-              <h3>Recent Conversations</h3>
-            </div>
-            <div className="history-conversation-list">
-              {conversations.map((conversation) => (
-                <div 
-                  key={conversation.id} 
-                  className="history-conversation-item"
-                  onClick={() => handleConversationSelect(conversation)}
-                >
-                  <div className="history-conversation-content">
-                    <h4 className="history-conversation-title">{conversation.title}</h4>
-                    <p className="history-conversation-preview">{conversation.preview}</p>
-                  </div>
-                  <div className="history-conversation-meta">
-                    <span className="history-conversation-time">{conversation.time}</span>
-                    <IonIcon icon={chevronForwardOutline} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </IonContent>
-        </IonPopover>
+
       </IonContent>
     </IonPage>
   );

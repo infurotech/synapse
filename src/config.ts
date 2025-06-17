@@ -27,12 +27,22 @@ export const LIST_MODELS = [
   },
 ];
 
+// Optimized inference parameters for speed
 export const DEFAULT_INFERENCE_PARAMS: InferenceParams = {
-  nThreads: 5, // auto
-  nContext: 4096,
-  nPredict: 500,
-  nBatch: 128,
-  temperature: 0.4,
+  nThreads: 8, // Increased from 5 for better parallelization
+  nContext: 2048, // Reduced from 4096 for faster processing
+  nPredict: 300, // Reduced from 500 for quicker responses
+  nBatch: 256, // Increased from 128 for better throughput
+  temperature: 0.3, // Reduced from 0.4 for more focused responses
+};
+
+// Performance-optimized inference for agent tasks
+export const AGENT_INFERENCE_PARAMS: InferenceParams = {
+  nThreads: 8,
+  nContext: 4096, // Smaller context for agent reasoning
+  nPredict: 200, // Reduced to prevent runaway generation
+  nBatch: 512, // Larger batch for speed
+  temperature: 0.2, // Lower temperature for consistent tool usage
 };
 
 export const DEFAULT_CHAT_TEMPLATE =

@@ -1,14 +1,4 @@
 import { AgentStep } from './AgentService';
-import { DatabaseAgent } from '../services/db/DatabaseService';
-
-interface ConversationContext {
-  id: string;
-  messages: ContextMessage[];
-  summary?: string;
-  importance: number;
-  lastAccessed: Date;
-  tags: string[];
-}
 
 interface ContextMessage {
   role: 'user' | 'assistant' | 'system';
@@ -21,7 +11,6 @@ interface ContextMessage {
 
 interface MemorySnapshot {
   shortTerm: ContextMessage[];
-  longTerm: ConversationContext[];
   workingMemory: Record<string, unknown>;
   entityMemory: Map<string, EntityMemory>;
 }
@@ -37,22 +26,19 @@ interface EntityMemory {
 
 export class MemoryManager {
   private static instance: MemoryManager;
-  private dbAgent: DatabaseAgent;
   private shortTermMemory: ContextMessage[] = [];
   private workingMemory: Map<string, unknown> = new Map();
   private entityMemory: Map<string, EntityMemory> = new Map();
-  private conversationContexts: Map<string, ConversationContext> = new Map();
   
   // Configuration
   private readonly MAX_SHORT_TERM = 20; // Last 20 messages
-  private readonly MAX_CONTEXT_WINDOW = 4096; // Tokens
+  private readonly MAX_CONTEXT_WINDOW = 1024; // Reduced for short-term focus
   private readonly MEMORY_CLEANUP_INTERVAL = 300000; // 5 minutes
   private readonly IMPORTANCE_THRESHOLD = 0.7;
   
   private cleanupTimer?: NodeJS.Timeout;
 
   private constructor() {
-    this.dbAgent = DatabaseAgent.getInstance();
     this.startMemoryCleanup();
   }
 
@@ -64,7 +50,7 @@ export class MemoryManager {
   }
 
   /**
-   * Add a new message to memory with automatic context management
+   * Add a new message to short-term memory with automatic context management
    */
   public addMessage(message: ContextMessage): void {
     // Add to short-term memory
@@ -164,31 +150,35 @@ export class MemoryManager {
   }
 
   /**
-   * Create a memory snapshot for persistence
+   * Create a memory snapshot for current session persistence
    */
   public createSnapshot(): MemorySnapshot {
     return {
       shortTerm: [...this.shortTermMemory],
-      longTerm: Array.from(this.conversationContexts.values()),
       workingMemory: Object.fromEntries(this.workingMemory),
       entityMemory: this.entityMemory
     };
   }
 
   /**
-   * Restore from memory snapshot
+   * Restore from memory snapshot for current session
    */
   public restoreFromSnapshot(snapshot: MemorySnapshot): void {
     this.shortTermMemory = snapshot.shortTerm || [];
     this.workingMemory = new Map(Object.entries(snapshot.workingMemory || {}));
     this.entityMemory = snapshot.entityMemory || new Map();
     
-    // Restore conversation contexts
-    snapshot.longTerm?.forEach(context => {
-      this.conversationContexts.set(context.id, context);
-    });
-    
     console.log('[MemoryManager] Restored from snapshot');
+  }
+
+  /**
+   * Clear all memory (useful for starting fresh conversations)
+   */
+  public clearMemory(): void {
+    this.shortTermMemory = [];
+    this.workingMemory.clear();
+    this.entityMemory.clear();
+    console.log('[MemoryManager] All memory cleared');
   }
 
   /**
@@ -199,7 +189,6 @@ export class MemoryManager {
       shortTermMessages: this.shortTermMemory.length,
       workingMemoryEntries: this.workingMemory.size,
       entityMemoryEntries: this.entityMemory.size,
-      conversationContexts: this.conversationContexts.size,
       memoryUsageKB: this.estimateMemoryUsage(),
       lastCleanup: this.cleanupTimer ? 'Active' : 'Inactive'
     };
@@ -328,11 +317,10 @@ export class MemoryManager {
   private manageMemorySize(): void {
     // Trim short-term memory if too large
     if (this.shortTermMemory.length > this.MAX_SHORT_TERM) {
-      const removed = this.shortTermMemory.splice(0, this.shortTermMemory.length - this.MAX_SHORT_TERM);
-      
-      // Archive important messages to long-term memory
-      removed.filter(msg => msg.importance && msg.importance > this.IMPORTANCE_THRESHOLD)
-             .forEach(msg => this.archiveToLongTerm(msg));
+      // Simply remove oldest messages (no long-term archiving)
+      const removedCount = this.shortTermMemory.length - this.MAX_SHORT_TERM;
+      this.shortTermMemory.splice(0, removedCount);
+      console.log(`[MemoryManager] Removed ${removedCount} old messages from short-term memory`);
     }
     
     // Clean up old working memory entries
@@ -343,13 +331,6 @@ export class MemoryManager {
         this.workingMemory.delete(key);
       }
     }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private archiveToLongTerm(message: ContextMessage): void {
-    // Implementation for archiving to long-term memory
-    // This could involve summarization and storage in database
-    console.log(`[MemoryManager] Archiving important message to long-term memory`);
   }
 
   private estimateTokens(text: string): number {
@@ -384,7 +365,6 @@ export class MemoryManager {
     this.shortTermMemory = [];
     this.workingMemory.clear();
     this.entityMemory.clear();
-    this.conversationContexts.clear();
     
     console.log('[MemoryManager] Disposed all resources');
   }

@@ -8,12 +8,9 @@ import {
 import { Model, ModelManager, Wllama } from '@wllama/wllama';
 import { DEFAULT_INFERENCE_PARAMS, WLLAMA_CONFIG_PATHS } from '../config';
 import { InferenceParams, RuntimeInfo, ModelState, Screen, Message } from './model_types';
-import { verifyCustomModel } from './custom-model';
 import {
   DisplayedModel,
   getDisplayedModels,
-  getUserAddedModels,
-  updateUserAddedModels,
 } from './displayed-model';
 
 interface WllamaContextValue {
@@ -36,9 +33,7 @@ interface WllamaContextValue {
   loadModel(model: DisplayedModel): Promise<void>;
   unloadModel(): Promise<void>;
 
-  // function for managing custom user model
-  addCustomModel(url: string): Promise<void>;
-  removeCustomModel(model: DisplayedModel): Promise<void>;
+
 
   // functions for chat completion
   getWllamaInstance(): Wllama;
@@ -80,17 +75,12 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [loadedModel, setLoadedModel] = useState<DisplayedModel>();
 
   const refreshCachedModels = async () => {
-    console.log('[WllamaContext] Refreshing cached models...');
     const cached = await modelManager.getModels();
-    console.log(`[WllamaContext] Found ${cached.length} cached models`);
     setCachedModels(cached);
   };
 
   useDidMount(() => {
-    console.log('[WllamaContext] Initializing WllamaContext...');
-    refreshCachedModels().then(() => {
-      console.log('[WllamaContext] WllamaContext initialized');
-    });
+    refreshCachedModels();
   });
 
   // computed variables
@@ -135,11 +125,9 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const downloadModel = async (model: DisplayedModel) => {
     if (isDownloading || loadedModel || isLoadingModel) {
-      console.log('[WllamaContext] Cannot start download - system is busy');
       throw new Error('System is busy with another operation');
     }
     
-    console.log(`[WllamaContext] Starting download for model: ${model.url}`);
     updateModelDownloadState(model.url, 0);
     
     try {
@@ -147,7 +135,6 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       await refreshCachedModels();
       const existingModel = cachedModels.find(m => m.url === model.url);
       if (existingModel) {
-        console.log(`[WllamaContext] Model ${model.url} already exists in cache`);
         updateModelDownloadState(model.url, -1);
         return;
       }
@@ -156,12 +143,9 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       await modelManager.downloadModel(model.url, {
         progressCallback(opts) {
           const progress = opts.loaded / opts.total;
-          console.log(`[WllamaContext] Download progress for ${model.url}: ${Math.round(progress * 100)}%`);
           updateModelDownloadState(model.url, progress);
         },
       });
-      
-      console.log(`[WllamaContext] Download completed for model: ${model.url}`);
       
       // Add a small delay to ensure filesystem operations complete
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -172,16 +156,11 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       let downloadedModel = null;
       
       while (retryCount < maxRetries) {
-        console.log(`[WllamaContext] Verifying cache for ${model.url} (attempt ${retryCount + 1}/${maxRetries})`);
-        
         // Get fresh models directly from modelManager instead of relying on state
         const freshCachedModels = await modelManager.getModels();
-        console.log(`[WllamaContext] Fresh cache check found ${freshCachedModels.length} models`);
-        
         downloadedModel = freshCachedModels.find(m => m.url === model.url);
         
         if (downloadedModel) {
-          console.log(`[WllamaContext] Model ${model.url} verified in cache`);
           // Update the state with fresh models
           setCachedModels(freshCachedModels);
           break;
@@ -189,7 +168,6 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         
         retryCount++;
         if (retryCount < maxRetries) {
-          console.log(`[WllamaContext] Cache verification attempt ${retryCount} failed, waiting before retry...`);
           await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds between retries
         }
       }
@@ -223,29 +201,17 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const loadModel = async (model: DisplayedModel) => {
     if (isDownloading || loadedModel || isLoadingModel) {
-      console.error('[WllamaContext] Cannot load model - system is busy');
-      console.error('[WllamaContext] Busy state details:', {
-        isDownloading,
-        loadedModel: !!loadedModel,
-        isLoadingModel,
-        isBusy,
-        loadedModelState: loadedModel?.state
-      });
       throw new Error('System is busy with another operation');
     }
 
     // Verify model is cached using direct access instead of state
-    console.log(`[WllamaContext] Checking cache for model: ${model.url}`);
     const freshCachedModels = await modelManager.getModels();
     const cachedModel = freshCachedModels.find(m => m.url === model.url);
     
     if (!cachedModel) {
-      console.error(`[WllamaContext] Cannot load model ${model.url} - not found in cache`);
-      console.error(`[WllamaContext] Available models:`, freshCachedModels.map(m => m.url));
       throw new Error('Model is not in cache');
     }
 
-    console.log(`[WllamaContext] Starting to load model: ${model.url}`);
     setLoadedModel(model.clone({ state: ModelState.LOADING }));
     
     try {
@@ -256,14 +222,12 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         offload_kqv: currParams.offload_kqv,
       });
       
-      console.log(`[WllamaContext] Successfully loaded model: ${model.url}`);
       setLoadedModel(model.clone({ state: ModelState.LOADED }));
       setCurrRuntimeInfo({
         isMultithread: wllamaInstance.isMultithread(),
         hasChatTemplate: !!wllamaInstance.getChatTemplate(),
       });
     } catch (e) {
-      console.error(`[WllamaContext] Failed to load model: ${model.url}`, e);
       resetWllamaInstance();
       setLoadedModel(undefined);
       const errorMessage = e instanceof Error ? e.message : 'Unknown error';
@@ -301,7 +265,7 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const { formatChat } = await import('./llama_utils');
       const formattedInput = await formatChat(wllamaInstance, messages);
       
-      console.log('[WllamaContext] Formatted input:', formattedInput);
+
       
       const result = await wllamaInstance.createCompletion(formattedInput, {
         nPredict: currParams.nPredict,
@@ -315,9 +279,6 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         },
       });
       callback(result);
-    } catch (error) {
-      console.error('[WllamaContext] Error in createCompletion:', error);
-      throw error;
     } finally {
       stopSignal = false;
       setGenerating(false);
@@ -325,7 +286,6 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const stopCompletion = () => {
-    console.log('[WllamaContext] Stop completion requested');
     stopSignal = true;
     setGenerating(false);
   };
@@ -344,64 +304,20 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setCurrParams(val);
   };
 
-  // function for managing custom user model
-  const addCustomModel = async (url: string) => {
-    setBusy(true);
-    try {
-      const custom = await verifyCustomModel(url);
-      if (models.some((m) => m.url === custom.url)) {
-        throw new Error('Model with the same URL already exist');
-      }
-      const userAddedModels = getUserAddedModels(cachedModels);
-      updateUserAddedModels([
-        ...userAddedModels,
-        new DisplayedModel(custom.url, custom.size, true, undefined),
-      ]);
-      await refreshCachedModels();
-    } catch (e) {
-      setBusy(false);
-      throw e instanceof Error ? e : new Error('Failed to add custom model');
-    }
-    setBusy(false);
-  };
 
-  const removeCustomModel = async (model: DisplayedModel) => {
-    setBusy(true);
-    if (model.isUserAdded) {
-      const userAddedModels = getUserAddedModels(cachedModels);
-      const newList = userAddedModels.filter((m) => m.url !== model.url);
-      updateUserAddedModels(newList);
-      await refreshCachedModels();
-    } else {
-      throw new Error('Cannot remove non-user-added model');
-    }
-    setBusy(false);
-  };
 
   const verifyModelInCache = async (modelUrl: string): Promise<boolean> => {
     const freshCachedModels = await modelManager.getModels();
-    console.log(`[WllamaContext] Verifying cache for: ${modelUrl}`);
-    console.log(`[WllamaContext] Available cached models:`, freshCachedModels.map(m => m.url));
     const foundModel = freshCachedModels.find(m => m.url === modelUrl);
     const isFound = !!foundModel;
-    console.log(`[WllamaContext] Model ${modelUrl} found in cache: ${isFound}`);
     return isFound;
   };
 
   const resetBusyState = () => {
-    console.log('[WllamaContext] Resetting busy state');
     setBusy(false);
   };
 
-  // @ts-expect-error window augmentation
-  window._exportModelList = function () {
-    const list: DisplayedModel[] = WllamaStorage.load('custom_models', []);
-    const listExported = list.map((m) => {
-      const { ...rest } = m;
-      return rest;
-    });
-    console.log(JSON.stringify(listExported, null, 2));
-  };
+
 
   return (
     <WllamaContext.Provider
@@ -427,8 +343,6 @@ export const WllamaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         navigateTo,
         currScreen,
         getWllamaInstance: () => wllamaInstance,
-        addCustomModel,
-        removeCustomModel,
         currRuntimeInfo,
       }}
     >

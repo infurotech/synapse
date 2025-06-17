@@ -21,7 +21,7 @@ export const useDidMount = (callback: () => unknown) => {
   
 
 // We define custom type StorageKey to represent the keys used in local storage, It can only be one of these four exact string values
-type StorageKey = 'conversations' | 'params' | 'welcome' | 'custom_models';
+type StorageKey = 'conversations' | 'params' | 'welcome';
 
 
 // WllamaStorage – LocalStorage Wrapper is a utility for saving and loading data to and from local storage

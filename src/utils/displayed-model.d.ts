@@ -16,7 +16,6 @@ export declare class DisplayedModel {
   clone(overwrite: Partial<DisplayedModel>): DisplayedModel;
 }
 
-export declare function getUserAddedModels(cachedModels: Model[]): DisplayedModel[];
-export declare function updateUserAddedModels(models: DisplayedModel[]): void;
+
 export declare function getPresetModels(cachedModels: Model[]): DisplayedModel[];
 export declare function getDisplayedModels(cachedModels: Model[]): DisplayedModel[]; 

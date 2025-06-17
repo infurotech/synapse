@@ -1,6 +1,5 @@
 import { Model } from '@wllama/wllama';
 import { ModelState, getModelType } from './model_types';
-import { WllamaStorage } from './llama_utils';
 import { LIST_MODELS } from '../config';
 
 export class DisplayedModel {
@@ -105,28 +104,7 @@ export class DisplayedModel {
   }
 }
 
-interface UserAddedModel {
-  url: string;
-  size: number;
-}
 
-export function getUserAddedModels(cachedModels: Model[]): DisplayedModel[] {
-  const userAddedModels: UserAddedModel[] = WllamaStorage.load(
-    'custom_models',
-    []
-  );
-  return userAddedModels.map((m: UserAddedModel) => {
-    const cachedModel = cachedModels.find((cm) => cm.url === m.url);
-    return new DisplayedModel(m.url, m.size, true, cachedModel);
-  });
-}
-
-export function updateUserAddedModels(models: DisplayedModel[]) {
-  const userAddedModels: UserAddedModel[] = models
-    .filter((m) => m.isUserAdded)
-    .map((m) => ({ url: m.url, size: m.size }));
-  WllamaStorage.save('custom_models', userAddedModels);
-}
 
 
 // models that come up with app
@@ -138,14 +116,9 @@ export function getPresetModels(cachedModels: Model[]): DisplayedModel[] {
 }
 
 export function getDisplayedModels(cachedModels: Model[]): DisplayedModel[] {
-  // Preset models
-  const presetModels = LIST_MODELS.map((m) => {
+  // Only preset models (no custom models)
+  return LIST_MODELS.map((m) => {
     const cachedModel = cachedModels.find((cm) => cm.url === m.url);
     return new DisplayedModel(m.url, m.size, false, cachedModel);
   });
-  // User-added models (if any)
-  return [
-    ...getUserAddedModels(cachedModels),
-    ...presetModels,
-  ];
 }
