@@ -5,6 +5,7 @@ import {
   IonIcon,
   IonButton,
   IonTextarea,
+  IonPopover,
 } from '@ionic/react';
 import {
   micOutline,
@@ -12,6 +13,7 @@ import {
   attachOutline,
   personOutline,
   timeOutline,
+  chevronForwardOutline,
   sparklesOutline,
   calendarOutline,
   clipboardOutline,
@@ -25,31 +27,41 @@ import { useWllama } from '../utils/wllama.context';
 import { formatText } from '../utils/nl2br';
 import { useAgent, AgentStep } from '../agent/AgentService';
 import AgentThinking from '../components/AgentThinking';
+import { isPlatform } from '@ionic/react';
 import './Dashboard.css';
 import './Dashboard-thinking.css';
+import { SpeechRecognition } from '@capacitor-community/speech-recognition';
+
+interface Conversation {
+  id: number;
+  title: string;
+  preview: string;
+  time: string;
+}
 
 interface ChatMessage {
-  id: number;
-  content: string;
-  role: 'user' | 'assistant';
-  timestamp: Date;
-  agentStep?: AgentStep;
-  toolName?: string;
-  isToolResult?: boolean;
-}
+    id: number;
+    content: string;
+    role: 'user' | 'assistant';
+    timestamp: Date;
+    agentStep?: AgentStep;
+    toolName?: string;
+    isToolResult?: boolean;
+  }
 
 const Dashboard: React.FC = () => {
   const [greeting, setGreeting] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [chatMessage, setChatMessage] = useState('');
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [isFullPageChat, setIsFullPageChat] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [showHistoryPopover, setShowHistoryPopover] = useState(false);
   const [streamingMessageId, setStreamingMessageId] = useState<number | null>(null);
-  
+
   const { loadedModel, models, loadModel } = useWllama();
   const { processQuery, stopProcessing, isProcessing, isSystemBusy, modelState } = useAgent();
-  
+
   const [, setCurrentAgentResponse] = useState('');
   const [agentSteps, setAgentSteps] = useState<AgentStep[]>([]);
 
@@ -67,12 +79,20 @@ const Dashboard: React.FC = () => {
     };
   };
 
-  const [suggestions] = useState([
-    { id: 1, text: 'Create a high priority task for my project', icon: clipboardOutline },
-    { id: 2, text: 'Add a task to call the client tomorrow', icon: calendarOutline },
-    { id: 3, text: 'Help me organize my day', icon: bulbOutline },
-    { id: 4, text: 'What can you help me with?', icon: sparklesOutline },
+  const [conversations] = useState<Conversation[]>([
+    { id: 1, title: 'Meeting preparation tips', preview: 'Can you help me prepare for tomorrow\'s...', time: '2h ago' },
+    { id: 2, title: 'Travel itinerary planning', preview: 'I need help planning my trip to...', time: '1d ago' },
+    { id: 3, title: 'Project deadline management', preview: 'How can I better manage my project...', time: '3d ago' },
+    { id: 4, title: 'Email writing assistance', preview: 'Help me draft a professional email...', time: '1w ago' },
   ]);
+
+  const [suggestions] = useState([
+    { id: 1, text: 'Plan my day', icon: calendarOutline },
+    { id: 2, text: 'Review upcoming tasks', icon: clipboardOutline },
+    { id: 3, text: 'Give me insights', icon: bulbOutline },
+    { id: 4, text: 'What should I focus on?', icon: sparklesOutline }
+  ]);
+
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -83,6 +103,12 @@ const Dashboard: React.FC = () => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const upcomingEvents = [
+    { id: 1, title: 'Team Meeting', time: '10:00 AM', urgent: true },
+    { id: 2, title: 'Lunch with Sarah', time: '1:00 PM', urgent: false },
+    { id: 3, title: 'Doctor Appointment', time: '3:30 PM', urgent: true },
+  ];
 
   useEffect(() => {
     const loadChatModel = async () => {
@@ -109,14 +135,6 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
-
-
-
-  const upcomingEvents = [
-    { id: 1, title: 'Team Meeting', time: '10:00 AM', urgent: true },
-    { id: 2, title: 'Lunch with Sarah', time: '1:00 PM', urgent: false },
-    { id: 3, title: 'Doctor Appointment', time: '3:30 PM', urgent: true },
-  ];
 
   const handleSendMessage = async () => {
     if (!chatMessage.trim()) return;
@@ -210,26 +228,78 @@ const Dashboard: React.FC = () => {
     }
   };
 
+
   const handleSuggestionClick = (suggestion: string) => {
     setChatMessage(suggestion);
+    setIsRecording(false); // Reset recording state when a suggestion is clicked
   };
 
-  const handleVoiceRecord = () => {
-    setIsRecording(!isRecording);
-    // Here you would implement voice recording functionality
+  const handleVoiceRecord = async () => {
+    if (!isPlatform('android') && !isPlatform('ios')) {
+      alert('Speech recognition is only available on mobile devices.');
+      return;
+    }
+
+    if (!isRecording) {
+      setIsRecording(true);
+
+      const perm = await SpeechRecognition.requestPermissions();
+      if (perm.speechRecognition !== 'granted') {
+        alert('Microphone permission is required for speech recognition.');
+        setIsRecording(false);
+        return;
+      }
+
+      try {
+        const result = await SpeechRecognition.start({
+          language: 'en-US',
+          maxResults: 1,
+          prompt: 'Speak now',
+          partialResults: false,
+          popup: true,
+        });
+
+        if (result.matches && result.matches.length > 0) {
+          setChatMessage(result.matches[0]);
+        } else {
+          alert('No speech detected. Please try again.');
+        }
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        alert('Speech recognition error: ' + errorMessage);
+      }
+      setIsRecording(false);
+    } else {
+      setIsRecording(false);
+      await SpeechRecognition.stop();
+    }
   };
 
-  const handleFileUpload = () => {
-    // File upload functionality to be implemented
+  const handleFileUpload = async () => {
+    console.log('File upload clicked');
   };
 
-  const handleBackToChat = () => {
-    setIsFullPageChat(false);
+  
+
+  const handleHistoryClick = () => {
+    setShowHistoryPopover(true);
+  };
+
+  const handleConversationSelect = (conversation: Conversation) => {
+    console.log('Loading conversation:', conversation.title);
+    setShowHistoryPopover(false);
+    setIsFullPageChat(true);
+    setIsRecording(false);
   };
 
   const handleStopGeneration = () => {
     stopProcessing();
     setStreamingMessageId(null);
+  };
+
+  const handleBackToChat = () => {
+    setIsFullPageChat(false);
+    setIsRecording(false);
   };
 
   if (isFullPageChat) {
@@ -254,74 +324,75 @@ const Dashboard: React.FC = () => {
             <div className="fullpage-messages">
               <div className="message-container">
                 {chatMessages.length === 0 ? (
-                  <>
-                    <div className="ai-message">
-                      <p>Hello! I'm your AI assistant powered by advanced reasoning and tool capabilities. How can I help you manage your tasks today?</p>
-                    </div>
-                  </>
+                    <>
+                        <div className="ai-message">
+                          <p>Hello, how can I help you today?</p>
+                        </div>
+                    </>
                 ) : (
-                  <>
-                    {chatMessages.map((message) => (
-                      <div key={message.id}>
-                        {/* Show thinking panel for assistant messages when processing */}
-                        {message.role === 'assistant' && message.id === streamingMessageId && agentSteps.length > 0 && (
-                          <AgentThinking 
-                            steps={agentSteps} 
-                            isProcessing={isProcessing}
-                            isCollapsible={true}
-                          />
-                        )}
-                        
-                        <div className={`${message.role}-message ${message.id === streamingMessageId ? 'streaming' : ''} ${message.isToolResult ? 'tool-result' : ''}`}>
-                          {message.isToolResult && (
-                            <div className="tool-indicator">
-                              <span>🔧 {message.toolName}</span>
-                            </div>
+                    <>
+                      {chatMessages.map((message) => (
+                        <div key={message.id}>
+                          {/* Show thinking panel for assistant messages when processing */}
+                          {message.role === 'assistant' && message.id === streamingMessageId && agentSteps.length > 0 && (
+                            <AgentThinking 
+                              steps={agentSteps} 
+                              isProcessing={isProcessing}
+                              isCollapsible={true}
+                            />
                           )}
-                          {message.role === 'assistant' && message.id === streamingMessageId && !message.content && isProcessing ? (
-                            <div className="thinking-indicator">
-                              <span>🤔 Thinking and using tools...</span>
-                              <div className="typing-dots">
-                                <div></div>
-                                <div></div>
-                                <div></div>
+                          
+                          <div className={`${message.role}-message ${message.id === streamingMessageId ? 'streaming' : ''} ${message.isToolResult ? 'tool-result' : ''}`}>
+                            {message.isToolResult && (
+                              <div className="tool-indicator">
+                                <span>🔧 {message.toolName}</span>
                               </div>
-                            </div>
-                          ) : (
-                            <p>{formatText(message.content)}</p>
-                          )}
+                            )}
+                            {message.role === 'assistant' && message.id === streamingMessageId && !message.content && isProcessing ? (
+                              <div className="thinking-indicator">
+                                <span>🤔 Thinking and using tools...</span>
+                                <div className="typing-dots">
+                                  <div></div>
+                                  <div></div>
+                                  <div></div>
+                                </div>
+                              </div>
+                            ) : (
+                              <p>{formatText(message.content)}</p>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                    
-                    {isProcessing && streamingMessageId === null && (
-                      <div className="typing-indicator">
-                        <span>AI is thinking with tools</span>
-                        <div className="typing-dots">
-                          <div></div>
-                          <div></div>
-                          <div></div>
+                      ))}
+                      
+                      {isProcessing && streamingMessageId === null && (
+                        <div className="typing-indicator">
+                          <span>AI is thinking with tools</span>
+                          <div className="typing-dots">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    
-                    <div ref={messagesEndRef} />
-                  </>
-                )}
-              </div>
+                      )}
+                      
+                      <div ref={messagesEndRef} />
+                    </>
+                  )}
+                </div>
             </div>
-                    
+            
             <div className="fullpage-input-section">
               <div className="fullpage-chat-input">
                 <IonTextarea
                   value={chatMessage}
                   onIonInput={(e) => setChatMessage(e.detail.value!)}
-                  placeholder="Ask me to create tasks, answer questions, or help with productivity..."
+                  placeholder="Ask me to create tasks, answer questions, or help with productivity.."
                   rows={1}
                   autoGrow={true}
                   className="fullpage-textarea"
                   disabled={isProcessing}
                 />
+
                 <div className="fullpage-actions">
                   <IonButton
                     fill="clear"
@@ -370,6 +441,7 @@ const Dashboard: React.FC = () => {
     <IonPage>
       <IonContent fullscreen className="dashboard-content">
         <div className="dashboard-container">
+          
           <motion.div
             className="greeting-section-top"
             initial={{ opacity: 0, y: -30 }}
@@ -408,6 +480,7 @@ const Dashboard: React.FC = () => {
             </div>
           </motion.div>
 
+          {/* Four Icons Row */}
           <motion.div
             className="quick-icons-section"
             initial={{ opacity: 0, y: 20 }}
@@ -415,33 +488,39 @@ const Dashboard: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="quick-icons-row">
+              
               <IonButton fill="clear" routerLink="/tasks" className="quick-icon-item">
                 <div className="quick-icon-content">
                   <IonIcon icon={checkboxOutline} />
                   <span>Tasks</span>
                 </div>
               </IonButton>
+
               <IonButton fill="clear" routerLink="/calendar" className="quick-icon-item">
                 <div className="quick-icon-content">
                   <IonIcon icon={calendarOutline} />
                   <span>Calendar</span>
                 </div>
               </IonButton>
+
               <IonButton fill="clear" routerLink="/goals" className="quick-icon-item">
                 <div className="quick-icon-content">
                   <IonIcon icon={flagOutline} />
                   <span>Goals</span>
                 </div>
               </IonButton>
+
               <IonButton fill="clear" routerLink="/profile" className="quick-icon-item">
                 <div className="quick-icon-content">
                   <IonIcon icon={personOutline} />
                   <span>Profile</span>
                 </div>
               </IonButton>
+              
             </div>
           </motion.div>
 
+          {/* Quick Events List - Clean and Minimal */}
           {upcomingEvents.length > 0 && (
             <motion.div
               className="quick-events-section"
@@ -471,8 +550,10 @@ const Dashboard: React.FC = () => {
           )}
         </div>
 
+        {/* Sticky Chat at Footer */}
         <div className="chat-footer-sticky">
           <div className="chat-center-container">
+            {/* AI Suggestions */}
             <div className="ai-suggestions">
               {suggestions.map((suggestion) => (
                 <motion.div
@@ -492,7 +573,7 @@ const Dashboard: React.FC = () => {
               <IonTextarea
                 value={chatMessage}
                 onIonInput={(e) => setChatMessage(e.detail.value!)}
-                placeholder="Create tasks, ask questions, get insights..."
+                placeholder="How can I assist you today?"
                 rows={3}
                 className="chat-input-center"
                 autoGrow={true}
@@ -500,7 +581,14 @@ const Dashboard: React.FC = () => {
               
               <div className="chat-actions-row">
                 <div className="left-actions">
-
+                  <IonButton
+                    fill="clear"
+                    className="action-button history-btn"
+                    onClick={handleHistoryClick}
+                    id="history-trigger"
+                  >
+                    <IonIcon icon={timeOutline} slot="icon-only" />
+                  </IonButton>
                 </div>
 
                 <div className="middle-actions">
@@ -509,6 +597,9 @@ const Dashboard: React.FC = () => {
                     className={`action-button voice-btn ${isRecording ? 'recording' : ''}`}
                     onClick={handleVoiceRecord}
                   >
+                  <style>
+                    "background-color :rgb(51, 113, 163);"
+                  </style>
                     <IonIcon icon={micOutline} slot="icon-only" />
                   </IonButton>
                 </div>
@@ -546,10 +637,40 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-
+        {/* History Popover */}
+        <IonPopover
+          isOpen={showHistoryPopover}
+          onDidDismiss={() => setShowHistoryPopover(false)}
+          trigger="history-trigger"
+          className="history-popover"
+        >
+          <IonContent className="history-popover-content">
+            <div className="history-popover-header">
+              <h3>Recent Conversations</h3>
+            </div>
+            <div className="history-conversation-list">
+              {conversations.map((conversation) => (
+                <div 
+                  key={conversation.id} 
+                  className="history-conversation-item"
+                  onClick={() => handleConversationSelect(conversation)}
+                >
+                  <div className="history-conversation-content">
+                    <h4 className="history-conversation-title">{conversation.title}</h4>
+                    <p className="history-conversation-preview">{conversation.preview}</p>
+                  </div>
+                  <div className="history-conversation-meta">
+                    <span className="history-conversation-time">{conversation.time}</span>
+                    <IonIcon icon={chevronForwardOutline} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </IonContent>
+        </IonPopover>
       </IonContent>
     </IonPage>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

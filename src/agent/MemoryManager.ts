@@ -15,6 +15,7 @@ interface MemorySnapshot {
   entityMemory: Map<string, EntityMemory>;
 }
 
+
 interface EntityMemory {
   name: string;
   type: 'person' | 'task' | 'goal' | 'concept' | 'tool';

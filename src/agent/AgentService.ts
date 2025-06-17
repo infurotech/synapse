@@ -27,6 +27,11 @@ const CONFIG = {
     STEP_PATTERN: /(THOUGHT:|TOOL_CALL:|FINAL_ANSWER:)/g,
     MAX_DEBUG_CONTENT: 200,
   },
+  GENERATION: {
+    MAX_RESPONSE_LENGTH: 15000, // Maximum response length before stopping generation
+    CORRUPTION_CHECK_MIN_LENGTH: 100, // Minimum length before checking for corruption
+    RUNAWAY_DETECTION_THRESHOLD: 20, // Number of repeated patterns to detect runaway
+  },
   CACHE: {
     MAX_PROMPT_CACHE_SIZE: 50,
     PROMPT_CACHE_TTL: 5 * 60 * 1000, // 5 minutes
@@ -135,11 +140,11 @@ Do not generate any other text or repeat content.
 <|im_end|>`,
 
     COMPLEX_SYSTEM: `<|im_start|>system
-You are a fast, efficient AI assistant specialized in productivity management. Be concise and direct. Keep responses short and focused.
+You are an AI assistant for productivity management. Use the exact format below.
 
-Available tools:
-- manageProductivity: Create and manage tasks, calendar events, and goals. Use type parameter to specify "task", "event", "goal", or combinations with OR (e.g., "task OR event")
-- respondToUser: Provide conversational responses to user queries based on internal reasoning without calling other tools
+Tools:
+- manageProductivity: For tasks, events, goals
+- respondToUser: For conversation
 
 manageProductivity tool usage examples:
 
@@ -156,30 +161,25 @@ FIELD REQUIREMENTS:
 Task Priority: high/medium/low (required for task create)
 Task Status: pending/in_progress/completed/cancelled (defaults to pending)
 
-RESPONSE FORMAT - Follow this exact structure (use each section only ONCE):
+FORMAT:
 
-THOUGHT: [Brief reasoning about what needs to be done]
+THOUGHT: Brief reasoning
 
 TOOL_CALL: {"name": "tool_name", "args": {...}}
 
-FINAL_ANSWER: [Clear, helpful response to the user]
+FINAL_ANSWER: Response
 
 EXAMPLE:
-THOUGHT: I need to create a task for the user's request.
+THOUGHT: Create task
 
 TOOL_CALL: {"name": "manageProductivity", "args": {"type": "task", "action": "create", "title": "Buy groceries", "priority": "high"}}
 
-FINAL_ANSWER: I've created a high priority task to buy groceries.
+FINAL_ANSWER: Task created
 
-IMPORTANT RULES:
-- Always put each step (THOUGHT, TOOL_CALL, FINAL_ANSWER) on separate lines with blank lines between them
-- Use manageProductivity for any task
-- Use respondToUser only for general conversation without database operations
-- For multi-step operations, use multiple TOOL_CALL entries if needed
-- Keep responses concise and stop after FINAL_ANSWER
-- Do not repeat or elaborate unnecessarily
-- NEVER repeat THOUGHT: multiple times - use only ONE THOUGHT per response
-- Stop generation immediately after FINAL_ANSWER
+RULES:
+- Use each section once only
+- Keep responses short
+- Stop after FINAL_ANSWER
 <|im_end|>`
   }), []);
 
@@ -269,7 +269,13 @@ export const useAgent = () => {
 
   // Enhanced response formatting - handle both structured and unstructured responses
   const formatResponseForDisplay = useCallback((content: string): string => {
-    if (!content || content.length > CONFIG.PARSING.MAX_CONTENT_LENGTH) return '';
+    if (!content) return '';
+    
+    // Use generation limit for display formatting, not parsing limit
+    if (content.length > CONFIG.GENERATION.MAX_RESPONSE_LENGTH) {
+      console.warn(`[AgentService] Content too long for display formatting (${content.length}), truncating`);
+      return '';
+    }
     
     // Check for repetitive content (like "HelloHelloHello")
     const words = content.split(/\s+/);
@@ -345,7 +351,7 @@ export const useAgent = () => {
 
     // Prevent memory issues with very long responses
     if (fullContent.length > CONFIG.PARSING.MAX_CONTENT_LENGTH) {
-      console.warn('[AgentService] Response too long, truncating parsing. Length:', fullContent.length);
+      console.warn(`[AgentService] Response too long for parsing (${fullContent.length} > ${CONFIG.PARSING.MAX_CONTENT_LENGTH}), truncating parsing`);
       console.warn('[AgentService] Response preview:', fullContent.substring(0, 500) + '...');
       return { steps: [], newParsedLength: lastParsedLength };
     }
@@ -743,15 +749,32 @@ export const useAgent = () => {
         await createCompletion(contextualPrompt, async (piece) => {
           currentResponse += piece;
           
-          // Early stopping for runaway generation (disabled for debugging)
-          if (currentResponse.length > 50000) {
-            console.warn('[AgentService] Response too long, stopping generation');
+          // Early stopping for runaway generation - use configurable limit
+          if (currentResponse.length > CONFIG.GENERATION.MAX_RESPONSE_LENGTH) {
+            console.warn(`[AgentService] Response exceeds maximum length (${CONFIG.GENERATION.MAX_RESPONSE_LENGTH}), stopping generation`);
             stopCompletion();
             return;
           }
           
-          // Runaway detection temporarily disabled to allow normal operation
-          // TODO: Re-enable with better logic after fixing root cause
+          // Detect character-level corruption only after minimum length
+          if (currentResponse.length > CONFIG.GENERATION.CORRUPTION_CHECK_MIN_LENGTH) {
+            const last100 = currentResponse.slice(-100);
+            
+            // Check for specific corruption patterns
+            if (/THTHO|THOUGHTTHOUGHT|THOUGHT:\s*THOUGHT:|THOUGHT:\s*I\s*THOUGHT:/i.test(last100)) {
+              console.warn('[AgentService] Detected character corruption in response, stopping generation');
+              stopCompletion();
+              return;
+            }
+            
+            // Advanced runaway detection - check for excessive repetition of patterns
+            const thoughtMatches = currentResponse.match(/THOUGHT:/g);
+            if (thoughtMatches && thoughtMatches.length > CONFIG.GENERATION.RUNAWAY_DETECTION_THRESHOLD) {
+              console.warn(`[AgentService] Detected runaway generation (${thoughtMatches.length} THOUGHT patterns), stopping generation`);
+              stopCompletion();
+              return;
+            }
+          }
           
           // Parse new content - get all steps from current response
           const { steps: allSteps } = parseAgentResponse(currentResponse, 0);
@@ -878,7 +901,13 @@ export type { AgentStep, TaskData, GoalData, CalendarEventData, MessageData, Con
 
 // Optimized utility function for external use
 export const formatAgentResponse = (content: string): string => {
-  if (!content || content.length > CONFIG.PARSING.MAX_CONTENT_LENGTH) return content;
+  if (!content) return content;
+  
+  // Use generation limit for formatting, with graceful fallback
+  if (content.length > CONFIG.GENERATION.MAX_RESPONSE_LENGTH) {
+    console.warn(`[AgentService] Content too long for formatting (${content.length}), returning as-is`);
+    return content;
+  }
   
   return content
     .replace(/(\w)(THOUGHT:|TOOL_CALL:|FINAL_ANSWER:)/g, '$1\n\n$2')

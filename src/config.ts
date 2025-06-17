@@ -40,9 +40,9 @@ export const DEFAULT_INFERENCE_PARAMS: InferenceParams = {
 export const AGENT_INFERENCE_PARAMS: InferenceParams = {
   nThreads: 8,
   nContext: 4096, // Smaller context for agent reasoning
-  nPredict: 200, // Reduced to prevent runaway generation
-  nBatch: 512, // Larger batch for speed
-  temperature: 0.2, // Lower temperature for consistent tool usage
+  nPredict: 150, // Short but sufficient for structured responses
+  nBatch: 256, // Reduced batch for more stable generation
+  temperature: 0.1, // Very low temperature for stable output
 };
 
 export const DEFAULT_CHAT_TEMPLATE =

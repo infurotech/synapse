@@ -5,6 +5,7 @@ import { tools, Tool } from './tools';
  * based on the agent's request.
  */
 
+
 interface SchemaProperty {
   type?: string;
   enum?: unknown[];
