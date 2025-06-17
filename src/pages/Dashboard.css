@@ -1164,6 +1164,7 @@
     /* border: 1px solid #89a1a2; */
     justify-content: space-around;
     align-items: center;
+    background-color: var(--glass-bg);
     backdrop-filter: var(--glass-backdrop);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
@@ -1174,7 +1175,7 @@
 
 .light-theme .quick-icons-row{
   background: rgb(255, 255, 255);
-  border: 1px solid #89a1a2;
+  border: 1px solid var(--glass-border);
 }
 
 .quick-icon-item {

@@ -112,9 +112,9 @@ http://ionicframework.com/docs/theming/ */
   --ion-text-color-rgb: 26, 26, 26;
 
   /* Light Theme Text Colors */
-  --text-primary: #1A1A1A;
-  --text-secondary: rgba(26, 26, 26, 0.8);
-  --text-muted: rgba(26, 26, 26, 0.6);
+  --text-primary: #2C3E50;
+  --text-secondary: rgba(44, 62, 80, 0.7);
+  --text-muted: rgba(44, 62, 80, 0.5);
 
   /* Light Theme Component Colors */
   --ion-item-background: rgba(255, 255, 255, 0.9);
@@ -335,14 +335,6 @@ ion-toggle {
     width: 100%;
     justify-content: center;
   }
-}
-
-/* Additional Light Theme Overrides */
-.light-theme {
-  /* Text color overrides for better contrast in light mode */
-  --text-primary: #2C3E50;
-  --text-secondary: rgba(44, 62, 80, 0.7);
-  --text-muted: rgba(44, 62, 80, 0.5);
 }
 
 .light-theme .section-title,
