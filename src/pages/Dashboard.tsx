@@ -2,39 +2,28 @@ import React, { useState, useEffect } from 'react';
 import {
   IonContent,
   IonPage,
-  IonCard,
-  IonCardContent,
   IonIcon,
   IonButton,
-  IonText,
-  IonInput,
-  IonItem,
-  IonList,
-  IonAvatar,
   IonTextarea,
   IonPopover,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
 } from '@ionic/react';
 import {
   micOutline,
   sendOutline,
   attachOutline,
   personOutline,
-  flash,
   timeOutline,
   chevronForwardOutline,
-  chatbubbleOutline,
   sparklesOutline,
   calendarOutline,
   clipboardOutline,
   bulbOutline,
-  timeSharp,
   checkboxOutline,
   flagOutline,
 } from 'ionicons/icons';
 import { motion } from 'framer-motion';
+import { isPlatform } from '@ionic/react';
+import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import './Dashboard.css';
 import { DatabaseService } from '../services/db';
 import { Goal as DBGoal, Subgoal as DBSubgoal } from '../services/db/DatabaseSchema';
@@ -43,6 +32,13 @@ interface ChatMessage {
   id: number;
   text: string;
   sender: 'user' | 'ai';
+}
+
+interface Conversation {
+  id: number;
+  title: string;
+  preview: string;
+  time: string;
 }
 
 const Dashboard: React.FC = () => {
@@ -54,9 +50,13 @@ const Dashboard: React.FC = () => {
     { id: 2, text: "I'm here to assist you with any questions or tasks you have. What would you like to work on?", sender: 'ai' },
   ]);
   const [isRecording, setIsRecording] = useState(false);
+
   const [isFullPageChat, setIsFullPageChat] = useState(false);
   const [showHistoryPopover, setShowHistoryPopover] = useState(false);
-  const [conversations, setConversations] = useState([
+  const [isRecording, setIsRecording] = useState(false);
+  const [chatMessage, setChatMessage] = useState('');
+
+  const [conversations] = useState<Conversation[]>([
     { id: 1, title: 'Meeting preparation tips', preview: 'Can you help me prepare for tomorrow\'s...', time: '2h ago' },
     { id: 2, title: 'Travel itinerary planning', preview: 'I need help planning my trip to...', time: '1d ago' },
     { id: 3, title: 'Project deadline management', preview: 'How can I better manage my project...', time: '3d ago' },
@@ -67,8 +67,9 @@ const Dashboard: React.FC = () => {
     { id: 1, text: 'Plan my day', icon: calendarOutline },
     { id: 2, text: 'Review upcoming tasks', icon: clipboardOutline },
     { id: 3, text: 'Give me insights', icon: bulbOutline },
-    { id: 4, text: 'What should I focus on?', icon: sparklesOutline },
+    { id: 4, text: 'What should I focus on?', icon: sparklesOutline }
   ]);
+
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -269,33 +270,73 @@ const Dashboard: React.FC = () => {
     }
   };
 
+
   const handleSuggestionClick = (suggestion: string) => {
     setChatMessage(suggestion);
+    setIsRecording(false); // Reset recording state when a suggestion is clicked
   };
 
-  const handleVoiceRecord = () => {
-    setIsRecording(!isRecording);
-    // Here you would implement voice recording functionality
+  const handleVoiceRecord = async () => {
+    if (!isPlatform('android') && !isPlatform('ios')) {
+      alert('Speech recognition is only available on mobile devices.');
+      return;
+    }
+
+    if (!isRecording) {
+      setIsRecording(true);
+
+      const perm = await SpeechRecognition.requestPermissions();
+      if (perm.speechRecognition !== 'granted') {
+        alert('Microphone permission is required for speech recognition.');
+        setIsRecording(false);
+        return;
+      }
+
+      try {
+        const result = await SpeechRecognition.start({
+          language: 'en-US',
+          maxResults: 1,
+          prompt: 'Speak now',
+          partialResults: false,
+          popup: true,
+        });
+
+        if (result.matches && result.matches.length > 0) {
+          setChatMessage(result.matches[0]);
+        } else {
+          alert('No speech detected. Please try again.');
+        }
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        alert('Speech recognition error: ' + errorMessage);
+      }
+      setIsRecording(false);
+    } else {
+      setIsRecording(false);
+      await SpeechRecognition.stop();
+    }
   };
 
-  const handleFileUpload = () => {
-    // Here you would implement file upload functionality
+  const handleFileUpload = async () => {
     console.log('File upload clicked');
   };
+
+  
 
   const handleHistoryClick = () => {
     setShowHistoryPopover(true);
   };
 
-  const handleConversationSelect = (conversation: any) => {
-    // Load the selected conversation
+  const handleConversationSelect = (conversation: Conversation) => {
     console.log('Loading conversation:', conversation.title);
     setShowHistoryPopover(false);
     setIsFullPageChat(true);
+    setIsRecording(false);
   };
 
   const handleBackToChat = () => {
     setIsFullPageChat(false);
+    setIsRecording(false);
   };
 
   if (isFullPageChat) {
@@ -523,6 +564,9 @@ const Dashboard: React.FC = () => {
                     className={`action-button voice-btn ${isRecording ? 'recording' : ''}`}
                     onClick={handleVoiceRecord}
                   >
+                  <style>
+                    "background-color :rgb(51, 113, 163);"
+                  </style>
                     <IonIcon icon={micOutline} slot="icon-only" />
                   </IonButton>
                 </div>
