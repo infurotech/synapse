@@ -58,14 +58,14 @@ export const lightTheme: Theme = {
     danger: '#E74C3C',
     background: '#F8F9FA',
     surface: 'rgba(255, 255, 255, 0.95)',
-    text: '#2C3E50',
-    textSecondary: 'rgba(44, 62, 80, 0.7)',
-    border: 'rgba(0, 0, 0, 0.1)',
+    text: '#1A1A1A',
+    textSecondary: 'rgba(26, 26, 26, 0.8)',
+    border: 'rgba(0, 0, 0, 0.15)',
     gradientPrimary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     gradientSecondary: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
     gradientDark: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-    glassBackground: 'rgba(255, 255, 255, 0.8)',
-    glassBorder: 'rgba(0, 0, 0, 0.1)',
+    glassBackground: 'rgba(255, 255, 255, 0.9)',
+    glassBorder: 'rgba(0, 0, 0, 0.15)',
   }
 };
 

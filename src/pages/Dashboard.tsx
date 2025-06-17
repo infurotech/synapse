@@ -11,6 +11,7 @@ import {
 import {
   micOutline,
   sendOutline,
+  attachOutline,
   personOutline,
   timeOutline,
   chevronForwardOutline,
@@ -122,11 +123,14 @@ const Dashboard: React.FC = () => {
       setAttachedFiles([]);
       setFileContents([]);
       setResetUploader(prev => prev + 1);
+      setIsRecording(false); // Reset recording state on new conversation
     }
   };
 
+
   const handleSuggestionClick = (suggestion: string) => {
     setChatMessage(suggestion);
+    setIsRecording(false); // Reset recording state when a suggestion is clicked
   };
 
   const handleVoiceRecord = async () => {
@@ -192,10 +196,12 @@ const Dashboard: React.FC = () => {
     console.log('Loading conversation:', conversation.title);
     setShowHistoryPopover(false);
     setIsFullPageChat(true);
+    setIsRecording(false);
   };
 
   const handleBackToChat = () => {
     setIsFullPageChat(false);
+    setIsRecording(false);
   };
 
   if (isFullPageChat) {

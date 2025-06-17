@@ -109,3 +109,53 @@
   color: var(--ion-color-primary);
   flex-shrink: 0;
 } 
+
+
+/* Light theme overrides */
+.light-theme .calendar-content {
+  --background: var(--cred-gradient-dark);
+}
+
+.light-theme .calendar-section,
+.light-theme .events-section {
+  background: var(--ion-card-background);
+  border: 1px solid var(--glass-border);
+}
+
+.light-theme .section-title {
+  color: var(--text-primary);
+}
+
+.light-theme .weekdays {
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.light-theme .month-grid ion-col {
+  color: var(--text-primary);
+}
+
+.light-theme .month-grid ion-col.today {
+  color: white;
+  font-weight: 600;
+}
+
+.light-theme .month-grid ion-col.today::after {
+  background-color: var(--ion-color-primary);
+}
+
+.light-theme .event-item {
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.light-theme .event-content h2 {
+  color: var(--text-primary);
+}
+
+.light-theme .event-content p {
+  color: var(--text-secondary);
+}
+
+.light-theme .event-content p ion-icon {
+  color: var(--ion-color-primary);
+}
