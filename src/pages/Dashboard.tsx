@@ -30,8 +30,10 @@ interface Message {
   id: number;
   text: string;
   files: File[];
+  fileContents: string[];
   isUser: boolean;
   timestamp: Date;
+  isSystemMessage?: boolean;
 }
 
 interface Conversation {
@@ -56,6 +58,7 @@ const Dashboard: React.FC = () => {
   const [resetUploader, setResetUploader] = useState(0);
   const [messages, setMessages] = useState<Message[]>([]);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [fileContents, setFileContents] = useState<string[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
   const [conversations] = useState<Conversation[]>([
@@ -89,24 +92,37 @@ const Dashboard: React.FC = () => {
   ];
 
   const handleSendMessage = () => {
-
     if (chatMessage.trim() || attachedFiles.length > 0) {
-      const newMessage: Message = {
+      const userMessage: Message = {
         id: Date.now(),
         text: chatMessage.trim(),
         files: [...attachedFiles],
+        fileContents: [],
         isUser: true,
         timestamp: new Date()
       };
       
-      setMessages(prev => [...prev, newMessage]);
+      setMessages(prev => [...prev, userMessage]);
+      
+      if (fileContents.length > 0) {
+        const systemMessage: Message = {
+          id: Date.now() + 1,
+          text: `System: User uploaded ${attachedFiles.length} file(s). Use this content when responding to user queries that is ${userMessage.text}:\n\n${fileContents.join('\n\n')}`,
+          files: [],
+          fileContents: [...fileContents],
+          isUser: false,
+          timestamp: new Date(),
+          isSystemMessage: true
+        };
+        setMessages(prev => [...prev, systemMessage]);
+      }
+      
       setIsFullPageChat(true);
-      console.log('Sending message:', chatMessage);
       setChatMessage('');
       setAttachedFiles([]);
+      setFileContents([]);
       setResetUploader(prev => prev + 1);
     }
-
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -154,15 +170,19 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = (file: File, formattedContent?: string) => {
     setAttachedFiles(prev => [...prev, file]);
+    if (formattedContent) {
+      setFileContents(prev => [...prev, formattedContent]);
+    }
   };
 
   const handleFileRemove = (file: File) => {
     setAttachedFiles(prev => prev.filter(f => f.name !== file.name || f.size !== file.size));
+    setFileContents(prev => prev.filter((_, index) => 
+      attachedFiles.findIndex(f => f.name === file.name && f.size === file.size) !== index
+    ));
   };
-
-  
 
   const handleHistoryClick = () => {
     setShowHistoryPopover(true);
@@ -177,7 +197,6 @@ const Dashboard: React.FC = () => {
   const handleBackToChat = () => {
     setIsFullPageChat(false);
   };
-
 
   if (isFullPageChat) {
     return (
@@ -207,7 +226,7 @@ const Dashboard: React.FC = () => {
                   <p>I'm here to assist you with any questions or tasks you have. What would you like to work on?</p>
                 </div>
 
-                {messages.map((message) => (
+                {messages.filter(message => !message.isSystemMessage).map((message) => (
                   <div key={message.id} className="message-wrapper">
                     {message.files.length > 0 && (
                       <div className={`${message.isUser ? 'user-files' : 'ai-files'}`}>
@@ -441,9 +460,9 @@ const Dashboard: React.FC = () => {
               />
               <IonButton
                 fill="clear"
-                className={`action-button send-btn ${chatMessage.trim() ? 'active' : 'inactive'}`}
+                className={`action-button send-btn ${(chatMessage.trim() || attachedFiles.length > 0) ? 'active' : 'inactive'}`}
                 onClick={handleSendMessage}
-                disabled={!chatMessage.trim()}
+                disabled={!chatMessage.trim() && attachedFiles.length === 0}
               >
                 <IonIcon icon={sendOutline} slot="icon-only" />
               </IonButton>

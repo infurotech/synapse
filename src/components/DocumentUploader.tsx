@@ -3,7 +3,7 @@ import { IonIcon, IonButton } from '@ionic/react';
 import { closeCircleOutline, attachOutline } from 'ionicons/icons';
 
 interface DocumentUploaderProps {
-  onFileUpload?: (file: File) => void;
+  onFileUpload?: (file: File, formattedContent?: string) => void;
   onFileRemove?: (file: File) => void;
   resetTrigger?: unknown; 
 }
@@ -69,16 +69,72 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onFileUpload, onFil
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const readFileContent = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        resolve(content);
+      };
+      
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+
+      const fileName = file.name.toLowerCase();
+      const isTextFile = file.type === 'text/plain' || fileName.endsWith('.txt');
+      const isJsonFile = file.type === 'application/json' || fileName.endsWith('.json');
+      const isPdfFile = file.type === 'application/pdf' || fileName.endsWith('.pdf');
+      const isDocxFile = file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
+                        fileName.endsWith('.docx') || fileName.endsWith('.doc');
+      const isCsvFile = file.type === 'text/csv' || fileName.endsWith('.csv');
+      const isXmlFile = file.type === 'text/xml' || fileName.endsWith('.xml');
+
+      if (isTextFile || isJsonFile || isCsvFile || isXmlFile) {
+        reader.readAsText(file);
+      } else if (isPdfFile || isDocxFile) {
+        reader.readAsText(file);
+      } else {
+        resolve('');
+      }
+    });
+  };
+
+  const formatFileContent = (file: File, content: string): string => {
+    if (!content) {
+      return `Document: ${file.name} (${(file.size / 1024).toFixed(2)} KB) - Could not read content`;
+    }
+    
+    const fileName = file.name;
+    const fileSize = (file.size / 1024).toFixed(2) + ' KB';
+    const fileType = fileName.split('.').pop()?.toUpperCase() || 'UNKNOWN';
+    
+    return `Document: ${fileName} (${fileSize}, ${fileType})\nContent:\n${content}`;
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const newFiles = Array.from(files).filter(
         file => !attachedFiles.some(f => f.name === file.name && f.size === file.size)
       );
+      
       setAttachedFiles(prev => [...prev, ...newFiles]);
+      
       if (onFileUpload) {
-        newFiles.forEach(file => onFileUpload(file));
+        for (const file of newFiles) {
+          try {
+            const content = await readFileContent(file);
+            const formattedContent = formatFileContent(file, content);
+            onFileUpload(file, formattedContent);
+          } catch (error) {
+            console.error('Error reading file:', error);
+            onFileUpload(file, ''); 
+          }
+        }
       }
+      
       e.target.value = '';
     }
   };
