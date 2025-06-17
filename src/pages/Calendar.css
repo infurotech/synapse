@@ -138,4 +138,23 @@
   font-weight: bold;
 }
 
-
+@media (max-width: 768px) {
+  .weekdays ion-col {
+    font-size: 12px; 
+    padding: 2px;
+  }
+  .month-grid ion-col {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
+@media (max-width: 480px) {
+  .weekdays ion-col {
+    font-size: 10px; 
+    padding: 1px;
+  }
+  .month-grid ion-col {
+    font-size: 10px;
+    padding: 6px;
+  }
+}

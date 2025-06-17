@@ -4,17 +4,6 @@ import { CalendarEvent } from './DatabaseSchema';
 import SQLiteHelper from './SQLiteHelper';
 
 
-// export interface CalendarEvent {
-//   id?: number;
-//   user_id: number;
-//   title: string;
-//   description?: string;
-//   start_time: string;
-//   end_time: string;
-//   location?: string;
-//   created_at?: string;
-//   updated_at?: string;
-// }
 
 export class CalendarHandler {
  private db: SQLiteDBConnection | null = null;
