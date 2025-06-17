@@ -1082,7 +1082,7 @@
 }
 
 .dark-theme .user-message p, .ai-message p {
-  color: #00ffd5;
+  color: white;
   margin: 0;
   line-height: 1.5;
 }
@@ -1285,7 +1285,7 @@
   --background: transparent;
   --border-radius: 16px;
   --color: white;
-  --placeholder-color: rgb(0 0 0 / 60%);
+  --placeholder-color: black;
   border: 1px solid rgb(0 0 0 / 12%);
   padding: 16px;
   font-size: 1rem;
@@ -1297,6 +1297,10 @@
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: var(--glass-backdrop);
   margin-bottom: 12px;
+}
+
+.dark-theme .chat-footer-sticky .chat-input-center {
+  --placeholder-color: white;
 }
 
 .chat-footer-sticky .chat-input-center:focus-within {
@@ -1331,7 +1335,7 @@
 
 .chat-footer-sticky .action-button ion-icon {
   font-size: 20px !important;
-  color: var(--text-secondary) !important;
+  color: var(--text-primary) !important;
   transition: color 0.2s ease;
 }
 

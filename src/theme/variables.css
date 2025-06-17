@@ -99,6 +99,8 @@ http://ionicframework.com/docs/theming/ */
 
   /* Theme transition */
   --theme-transition: all 0.3s ease;
+
+  --text-primary: #2C3E50;
 }
 
 /* Light Theme Variables */
