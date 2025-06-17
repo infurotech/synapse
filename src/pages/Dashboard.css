@@ -514,11 +514,6 @@
   }
 }
 
-/* History Button */
-.history-btn {
-  /* Removed special styling to match other action buttons */
-}
-
 /* Apply the same styles to sticky footer */
 .chat-footer-sticky .chat-actions-row {
   display: flex;
