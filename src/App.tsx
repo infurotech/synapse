@@ -25,6 +25,7 @@ import Goals from './pages/Goals';
 import Profile from './pages/Profile';
 import SplashScreen from './components/SplashScreen';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { DatabaseProvider } from './contexts/DatabaseContext';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -76,7 +77,8 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <ThemeProvider>
-        <IonReactRouter>
+        <DatabaseProvider>
+          <IonReactRouter>
           <IonTabs>
             <IonRouterOutlet>
               <Route exact path="/login">
@@ -103,6 +105,7 @@ const App: React.FC = () => {
             </IonRouterOutlet>
           </IonTabs>
         </IonReactRouter>
+        </DatabaseProvider>
       </ThemeProvider>
     </IonApp>
   );
