@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { IonIcon, IonButton } from '@ionic/react';
 import { closeCircleOutline, attachOutline } from 'ionicons/icons';
+import * as pdfjsLib from 'pdfjs-dist';
+import { TextItem } from 'pdfjs-dist/types/src/display/api';
+import mammoth from 'mammoth';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 interface DocumentUploaderProps {
   onFileUpload?: (file: File, formattedContent?: string) => void;
@@ -71,17 +76,6 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onFileUpload, onFil
 
   const readFileContent = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        resolve(content);
-      };
-      
-      reader.onerror = () => {
-        reject(new Error('Failed to read file'));
-      };
-
       const fileName = file.name.toLowerCase();
       const isTextFile = file.type === 'text/plain' || fileName.endsWith('.txt');
       const isJsonFile = file.type === 'application/json' || fileName.endsWith('.json');
@@ -92,9 +86,53 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onFileUpload, onFil
       const isXmlFile = file.type === 'text/xml' || fileName.endsWith('.xml');
 
       if (isTextFile || isJsonFile || isCsvFile || isXmlFile) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target?.result as string;
+          resolve(content);
+        };
+        reader.onerror = () => reject(new Error('Error reading text file'));
         reader.readAsText(file);
-      } else if (isPdfFile || isDocxFile) {
-        reader.readAsText(file);
+      } else if (isPdfFile) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const arrayBuffer = e.target?.result as ArrayBuffer;
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = '';
+            
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const textContent = await page.getTextContent();
+              const pageText = textContent.items
+                .filter((item): item is TextItem => 'str' in item)
+                .map(item => item.str)
+                .join(' ');
+              fullText += pageText + '\n\n';
+            }
+            
+            resolve(fullText);
+          } catch (error) {
+            console.error('Error reading PDF:', error);
+            reject(error);
+          }
+        };
+        reader.onerror = () => reject(new Error('Error reading PDF file'));
+        reader.readAsArrayBuffer(file);
+      } else if (isDocxFile) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const arrayBuffer = e.target?.result as ArrayBuffer;
+            const result = await mammoth.extractRawText({ arrayBuffer });
+            resolve(result.value);
+          } catch (error) {
+            console.error('Error reading DOCX:', error);
+            reject(error);
+          }
+        };
+        reader.onerror = () => reject(new Error('Error reading DOCX file'));
+        reader.readAsArrayBuffer(file);
       } else {
         resolve('');
       }
@@ -159,6 +197,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onFileUpload, onFil
           style={{ display: 'none' }}
           onChange={handleFileChange}
           multiple
+          accept=".txt,.pdf,.docx,.doc,.json,.csv,.xml"
         />
       </div>
       {attachedFiles.length > 0 && (
