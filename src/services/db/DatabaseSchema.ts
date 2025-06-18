@@ -38,7 +38,7 @@ export interface Task {
 
 // Calendar event schema
 export interface CalendarEvent {
-  id: number;
+  id?: number;
   title: string;
   description?: string;
   start_time: string;

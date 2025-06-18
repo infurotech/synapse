@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DocumentUploader from '../components/DocumentUploader';
+import { parseEventPrompt } from '../utils/parseEventPrompt';
+import { CalendarHandler } from '../services/db/CalendarHandler';
 import {
   IonContent,
   IonPage,
@@ -26,6 +28,8 @@ import { motion } from 'framer-motion';
 import { isPlatform } from '@ionic/react';
 import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import './Dashboard.css';
+import { CalendarEvent } from '../services/db';
+
 
 interface Message {
   id: number;
@@ -52,7 +56,7 @@ interface Suggestion {
 
 const Dashboard: React.FC = () => {
   const [greeting, setGreeting] = useState('');
-  
+
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullPageChat, setIsFullPageChat] = useState(false);
   const [showHistoryPopover, setShowHistoryPopover] = useState(false);
@@ -86,14 +90,20 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const upcomingEvents =  [
+  const upcomingEvents = [
     { id: 1, title: 'Team Meeting', time: '10:00 AM', urgent: true },
     { id: 2, title: 'Lunch with Sarah', time: '1:00 PM', urgent: false },
     { id: 3, title: 'Doctor Appointment', time: '3:30 PM', urgent: true },
   ];
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (chatMessage.trim() || attachedFiles.length > 0) {
+      // Try to save event from prompt
+      const saved = await handleSaveEventFromPrompt(chatMessage);
+      if (saved) {
+        alert('Event saved to calendar!');
+      }
+
       const userMessage: Message = {
         id: Date.now(),
         text: chatMessage.trim(),
@@ -102,9 +112,9 @@ const Dashboard: React.FC = () => {
         isUser: true,
         timestamp: new Date()
       };
-      
+
       setMessages(prev => [...prev, userMessage]);
-      
+
       if (fileContents.length > 0) {
         const systemMessage: Message = {
           id: Date.now() + 1,
@@ -117,13 +127,48 @@ const Dashboard: React.FC = () => {
         };
         setMessages(prev => [...prev, systemMessage]);
       }
-      
+
       setIsFullPageChat(true);
       setChatMessage('');
       setAttachedFiles([]);
       setFileContents([]);
       setResetUploader(prev => prev + 1);
       setIsRecording(false); // Reset recording state on new conversation
+    }
+  };
+
+  const handleSaveEventFromPrompt = async (prompt: string) => {
+    try {
+      // Parse the prompt
+      const parsed = parseEventPrompt(prompt);
+
+      if (!parsed || !parsed.title || !parsed.date || !parsed.startTime || !parsed.endTime) {
+        // Not an event prompt, or missing required information
+        return false;
+      }
+
+      // Format to ISO strings
+      const start_time = `${parsed.date}T${parsed.startTime}`;
+      const end_time = `${parsed.date}T${parsed.endTime}`;
+
+      // Construct the event object
+      const event: CalendarEvent = {
+        title: parsed.title,
+        description: parsed.description || '',
+        start_time,
+        end_time,
+        location: parsed.location || '',
+        created_at: new Date().toISOString(), // Assign an empty string
+        updated_at: new Date().toISOString(), // Assign an empty string
+      };
+      // Use CalendarHandler to create the event
+      const handler = new CalendarHandler();
+      await handler.createEvent(event);
+
+      return true;
+    } catch (e) {
+      console.error('Event save error:', e);
+      return false;
     }
   };
 
@@ -183,7 +228,7 @@ const Dashboard: React.FC = () => {
 
   const handleFileRemove = (file: File) => {
     setAttachedFiles(prev => prev.filter(f => f.name !== file.name || f.size !== file.size));
-    setFileContents(prev => prev.filter((_, index) => 
+    setFileContents(prev => prev.filter((_, index) =>
       attachedFiles.findIndex(f => f.name === file.name && f.size === file.size) !== index
     ));
   };
@@ -210,19 +255,19 @@ const Dashboard: React.FC = () => {
         <IonContent fullscreen className="fullpage-chat-content">
           <div className="fullpage-chat-container">
             <div className="fullpage-header">
-              <IonButton 
-                fill="clear" 
+              <IonButton
+                fill="clear"
                 className="back-button"
                 onClick={handleBackToChat}
               >
                 ← Back
               </IonButton>
               <div className="fullpage-title">
-                <img src="logo-white.png" alt="Synapse Logo" style={{width: '20px', height: '20px'}} />
+                <img src="logo-white.png" alt="Synapse Logo" style={{ width: '20px', height: '20px' }} />
                 <span>Synapse AI</span>
               </div>
             </div>
-            
+
             <div className="fullpage-messages">
               <div className="message-container">
                 <div className="user-message">
@@ -239,8 +284,8 @@ const Dashboard: React.FC = () => {
                         {message.files.map((file, index) => {
                           const fileName = file.name;
                           const maxLength = 20;
-                          const displayName = fileName.length > maxLength 
-                            ? fileName.substring(0, maxLength) + '...' 
+                          const displayName = fileName.length > maxLength
+                            ? fileName.substring(0, maxLength) + '...'
                             : fileName;
                           return (
                             <span key={index} className="file-chip">
@@ -259,7 +304,7 @@ const Dashboard: React.FC = () => {
                 ))}
               </div>
             </div>
-            
+
             <div className="fullpage-input-section">
               <div className="fullpage-chat-input">
                 <IonTextarea
@@ -279,11 +324,11 @@ const Dashboard: React.FC = () => {
                     <IonIcon icon={micOutline} slot="icon-only" />
                   </IonButton>
 
-                  <DocumentUploader 
-                    onFileUpload={handleFileUpload} 
+                  <DocumentUploader
+                    onFileUpload={handleFileUpload}
                     onFileRemove={handleFileRemove}
-                    resetTrigger={resetUploader} 
-                  /> 
+                    resetTrigger={resetUploader}
+                  />
                   <IonButton
                     fill="clear"
                     className={`fullpage-action-btn send-btn ${(chatMessage.trim() || attachedFiles.length > 0) ? 'active' : 'inactive'}`}
@@ -327,7 +372,7 @@ const Dashboard: React.FC = () => {
                       ease: "easeInOut",
                     }}
                   >
-                    <img src="logo-white.png" alt="Synapse Logo" style={{width: '26px', height: '26px'}} />
+                    <img src="logo-white.png" alt="Synapse Logo" style={{ width: '26px', height: '26px' }} />
                   </motion.div>
                   <div className="greeting-text-content-top">
                     <h2 className="greeting-text-top">{greeting}!</h2>
@@ -412,70 +457,70 @@ const Dashboard: React.FC = () => {
         <div className="chat-footer-sticky">
           <div className="chat-center-container">
 
-        {/* AI Suggestions */}
-        <div className="ai-suggestions">
-          {suggestions.map((suggestion) => (
-            <motion.div
-              key={suggestion.id}
-              className="suggestion-chip"
-              onClick={() => handleSuggestionClick(suggestion.text)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <IonIcon icon={suggestion.icon} />
-              <span>{suggestion.text}</span>
-            </motion.div>
-          ))}
-        </div>
+            {/* AI Suggestions */}
+            <div className="ai-suggestions">
+              {suggestions.map((suggestion) => (
+                <motion.div
+                  key={suggestion.id}
+                  className="suggestion-chip"
+                  onClick={() => handleSuggestionClick(suggestion.text)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <IonIcon icon={suggestion.icon} />
+                  <span>{suggestion.text}</span>
+                </motion.div>
+              ))}
+            </div>
 
-        <div className="chat-input-section" style={{ position: 'relative' }}>
-          <IonTextarea
-            value={chatMessage}
-            onIonInput={(e) => setChatMessage(e.detail.value!)}
-            placeholder="How can I assist you today?"
-            rows={3}
-            className="chat-input-center"
-            autoGrow={true}
-            style={{ paddingTop: '40px' }}
-          />
-          <div className="chat-actions-row">
-            <div className="left-actions">
-              <IonButton
-                fill="clear"
-                className="action-button history-btn"
-                onClick={handleHistoryClick}
-                id="history-trigger"
-              >
-                <IonIcon icon={timeOutline} slot="icon-only" />
-              </IonButton>
-            </div>
-            <div className="middle-actions">
-              <IonButton
-                fill="clear"
-                className={`action-button voice-btn ${isRecording ? 'recording' : ''}`}
-                onClick={handleVoiceRecord}
-              >
-                <IonIcon icon={micOutline} slot="icon-only" />
-              </IonButton>
-            </div>
-            <div className="right-actions">
-              <DocumentUploader 
-                onFileUpload={handleFileUpload} 
-                onFileRemove={handleFileRemove}
-                resetTrigger={resetUploader} 
+            <div className="chat-input-section" style={{ position: 'relative' }}>
+              <IonTextarea
+                value={chatMessage}
+                onIonInput={(e) => setChatMessage(e.detail.value!)}
+                placeholder="How can I assist you today?"
+                rows={3}
+                className="chat-input-center"
+                autoGrow={true}
+                style={{ paddingTop: '40px' }}
               />
-              <IonButton
-                fill="clear"
-                className={`action-button send-btn ${(chatMessage.trim() || attachedFiles.length > 0) ? 'active' : 'inactive'}`}
-                onClick={handleSendMessage}
-                disabled={!chatMessage.trim() && attachedFiles.length === 0}
-              >
-                <IonIcon icon={sendOutline} slot="icon-only" />
-              </IonButton>
+              <div className="chat-actions-row">
+                <div className="left-actions">
+                  <IonButton
+                    fill="clear"
+                    className="action-button history-btn"
+                    onClick={handleHistoryClick}
+                    id="history-trigger"
+                  >
+                    <IonIcon icon={timeOutline} slot="icon-only" />
+                  </IonButton>
+                </div>
+                <div className="middle-actions">
+                  <IonButton
+                    fill="clear"
+                    className={`action-button voice-btn ${isRecording ? 'recording' : ''}`}
+                    onClick={handleVoiceRecord}
+                  >
+                    <IonIcon icon={micOutline} slot="icon-only" />
+                  </IonButton>
+                </div>
+                <div className="right-actions">
+                  <DocumentUploader
+                    onFileUpload={handleFileUpload}
+                    onFileRemove={handleFileRemove}
+                    resetTrigger={resetUploader}
+                  />
+                  <IonButton
+                    fill="clear"
+                    className={`action-button send-btn ${(chatMessage.trim() || attachedFiles.length > 0) ? 'active' : 'inactive'}`}
+                    onClick={handleSendMessage}
+                    disabled={!chatMessage.trim() && attachedFiles.length === 0}
+                  >
+                    <IonIcon icon={sendOutline} slot="icon-only" />
+                  </IonButton>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        </div>
         </div>
         {/* History Popover */}
         <IonPopover
@@ -490,8 +535,8 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="history-conversation-list">
               {conversations.map((conversation) => (
-                <div 
-                  key={conversation.id} 
+                <div
+                  key={conversation.id}
                   className="history-conversation-item"
                   onClick={() => handleConversationSelect(conversation)}
                 >
