@@ -53,8 +53,6 @@ const Dashboard: React.FC = () => {
 
   const [isFullPageChat, setIsFullPageChat] = useState(false);
   const [showHistoryPopover, setShowHistoryPopover] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [chatMessage, setChatMessage] = useState('');
 
   const [conversations] = useState<Conversation[]>([
     { id: 1, title: 'Meeting preparation tips', preview: 'Can you help me prepare for tomorrow\'s...', time: '2h ago' },
@@ -510,7 +508,8 @@ const Dashboard: React.FC = () => {
                       <span>{event.time}</span>
                     </div>
                     <span className="event-title-simple">{event.title}</span>
-                    {event.urgent && <div className="urgent-dot" />}n                  </motion.div>
+                    {event.urgent && <div className="urgent-dot" />}
+                  </motion.div>
                 ))}
               </div>
             </motion.div>
