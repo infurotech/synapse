@@ -1,0 +1,12 @@
+{
+	"appId": "com.synapse.app",
+	"appName": "Synapse",
+	"webDir": "dist",
+	"packageClassList": [
+		"CapacitorSQLitePlugin",
+		"AppPlugin",
+		"HapticsPlugin",
+		"KeyboardPlugin",
+		"StatusBarPlugin"
+	]
+}

@@ -1,0 +1,298 @@
+/* ===== AGENT THINKING COMPONENT ===== */
+.agent-thinking-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid rgba(108, 92, 231, 0.2);
+  border-radius: 16px;
+  margin: 12px 0;
+  padding: 16px 20px;
+  position: relative;
+  overflow: hidden;
+  animation: thinkingPanelSlideIn 0.4s ease-out;
+  max-width: 85%;
+  margin-left: auto;
+  margin-right: 15%;
+}
+
+.agent-thinking-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(108, 92, 231, 0.1),
+    transparent
+  );
+  animation: thinkingShimmer 2s infinite;
+}
+
+.agent-thinking-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.thinking-icon {
+  width: 20px;
+  height: 20px;
+  background: var(--cred-gradient-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: thinkingIconPulse 1.5s ease-in-out infinite;
+}
+
+.thinking-icon ion-icon {
+  font-size: 12px;
+  color: white;
+}
+
+.thinking-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  margin: 0;
+}
+
+.thinking-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.thinking-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: thinkingStepSlideIn 0.5s ease-out forwards;
+}
+
+.thinking-step.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.thinking-step-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.thinking-step-icon.thought {
+  background: rgba(255, 193, 7, 0.2);
+  border: 1px solid rgba(255, 193, 7, 0.4);
+}
+
+.thinking-step-icon.tool-call {
+  background: rgba(0, 123, 255, 0.2);
+  border: 1px solid rgba(0, 123, 255, 0.4);
+}
+
+.thinking-step-icon.tool-result {
+  background: rgba(40, 167, 69, 0.2);
+  border: 1px solid rgba(40, 167, 69, 0.4);
+}
+
+.thinking-step-icon ion-icon {
+  font-size: 10px;
+  color: currentColor;
+}
+
+.thinking-step-icon.thought ion-icon {
+  color: #ffc107;
+}
+
+.thinking-step-icon.tool-call ion-icon {
+  color: #007bff;
+}
+
+.thinking-step-icon.tool-result ion-icon {
+  color: #28a745;
+}
+
+.thinking-step-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.thinking-step-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 4px 0;
+  text-transform: capitalize;
+}
+
+.thinking-step-description {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.thinking-step.loading .thinking-step-description {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.thinking-step.loading .thinking-step-description::after {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  animation: thinkingSpinner 1s linear infinite;
+}
+
+.tool-args-preview {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin-top: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+  max-height: 40px;
+  overflow: hidden;
+  position: relative;
+}
+
+.tool-args-preview::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.3));
+}
+
+.thinking-collapse-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.thinking-collapse-button:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.thinking-collapsed {
+  height: 60px;
+  overflow: hidden;
+}
+
+.thinking-collapsed .thinking-steps {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Thinking Component Animations */
+@keyframes thinkingPanelSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes thinkingShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes thinkingIconPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 8px rgba(108, 92, 231, 0);
+  }
+}
+
+@keyframes thinkingStepSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes thinkingSpinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile Responsive Styles for Thinking Component */
+@media (max-width: 480px) {
+  .agent-thinking-panel {
+    margin: 8px 0;
+    padding: 12px 16px;
+    margin-right: 5%;
+  }
+
+  .thinking-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .thinking-title {
+    font-size: 0.8rem;
+  }
+
+  .thinking-step-title {
+    font-size: 0.7rem;
+  }
+
+  .thinking-step-description {
+    font-size: 0.65rem;
+  }
+} 
