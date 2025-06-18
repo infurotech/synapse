@@ -20,14 +20,12 @@ import {
 } from '@ionic/react';
 import {
   trophyOutline,
-  timeOutline,
   checkmarkCircleOutline,
   flagOutline,
   chevronDownOutline,
   chevronUpOutline,
   trashOutline,
 } from 'ionicons/icons';
-// import { useState, useEffect, useCallback } from 'react';
 import './Goals.css';
 import { useDatabase } from '../contexts/DatabaseContext';
 import { DatabaseService } from '../services/db';
