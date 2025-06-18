@@ -350,6 +350,7 @@
   line-height: 1.5;
   min-height: 100px;
   max-height: 200px;
+  width: 100%;
   resize: none;
   border-radius: 18px;
   background: var(--glass-bg);
@@ -1051,6 +1052,60 @@
   width: 100%;
 }
 
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.user-files, .ai-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  max-width: 80%;
+}
+
+.user-files {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.ai-files {
+  background: rgba(108, 92, 231, 0.08);
+  border: 1px solid rgba(108, 92, 231, 0.15);
+  align-self: flex-start;
+}
+
+.file-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-files .file-chip {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+}
+
+.ai-files .file-chip {
+  background: rgba(108, 92, 231, 0.12);
+  border: 1px solid rgba(108, 92, 231, 0.25);
+  border-radius: 16px;
+}
+
 .user-message, .ai-message {
   padding: 16px 20px;
   border-radius: 20px;
@@ -1333,6 +1388,9 @@
   font-size: 20px !important;
   color: var(--text-primary) !important;
   transition: color 0.2s ease;
+}
+.dark-theme .chat-footer-sticky .send-btn ion-icon {
+  color: rgba(255, 255, 255, 0.8) !important;
 }
 
 .chat-footer-sticky .action-button:hover {
