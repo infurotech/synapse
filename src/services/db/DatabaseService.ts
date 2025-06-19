@@ -179,6 +179,56 @@ export class DatabaseService {
         FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
       );
     `);
+
+    // Message files table
+    console.log('Creating message_files table');
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS message_files (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        message_id INTEGER NOT NULL,
+        file_name TEXT NOT NULL,
+        file_content TEXT,
+        file_url TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE
+      );
+    `);
+
+    // Ensure default user exists
+    await this.ensureDefaultUser();
+  }
+
+  /**
+   * Ensure a default user exists in the database
+   */
+  private async ensureDefaultUser(): Promise<void> {
+    if (!this.db) {
+      throw new Error('Database connection not established');
+    }
+
+    try {
+      // Check if any users exist
+      const userCountResult = await this.db.query('SELECT COUNT(*) as count FROM users;');
+      if (userCountResult.values && userCountResult.values[0].count === 0) {
+        console.log('No users found, creating default user...');
+        
+        // Create a default user
+        const defaultEmail = 'default@synapse.app';
+        const insertQuery = `
+          INSERT INTO users (email, theme_preference)
+          VALUES (?, ?) 
+        `;
+        const values = [defaultEmail, 'system'];
+        await this.db.run(insertQuery, values);
+        
+        console.log('Default user created successfully');
+      } else {
+        console.log('Users already exist in database');
+      }
+    } catch (error) {
+      console.error('Error ensuring default user:', error);
+      throw error;
+    }
   }
 
   /**
@@ -192,17 +242,14 @@ export class DatabaseService {
     try {
       console.log('Testing database connection...');
       
-      // Insert a test user if no users exist
-      const userCountResult = await this.db.query('SELECT COUNT(*) as count FROM users;');
-      if (userCountResult.values && userCountResult.values[0].count === 0) {
-        const testEmail = `test_${Date.now()}@example.com`;
-        const insertQuery = `
-          INSERT INTO users (email, theme_preference)
-          VALUES (?, ?) 
-        `;
-        const values = [testEmail, 'system'];
-        await this.db.run(insertQuery, values);
-      
+      // Create a test user
+      const testEmail = `test_${Date.now()}@example.com`;
+      const insertQuery = `
+        INSERT INTO users (email, theme_preference)
+        VALUES (?, ?) 
+      `;
+      const values = [testEmail, 'system'];
+      await this.db.run(insertQuery, values);
       
       // Retrieve the inserted user
       const selectQuery = `SELECT * FROM users WHERE email = ?`;
@@ -219,7 +266,7 @@ export class DatabaseService {
       console.log('Test user deleted.');
 
       console.log('Database connection test successful.');
-    } }catch (error) {
+    } catch (error) {
       console.error('Database connection test failed:', error);
       throw error;
     }
@@ -282,6 +329,41 @@ export class DatabaseService {
     if (!this.db) throw new Error('Database not initialized');
     const query = `DELETE FROM conversations WHERE id =?`;
     await this.db.run(query, [conversationId]);
+  }
+
+  /**
+   * Get the default user ID (first user in the database)
+   */
+  public async getDefaultUserId(): Promise<number> {
+    if (!this.db) throw new Error('Database not initialized');
+    const query = 'SELECT id FROM users ORDER BY id ASC LIMIT 1';
+    const res = await this.db.query(query);
+    if (!res.values || res.values.length === 0) {
+      throw new Error('No users found in database');
+    }
+    return res.values[0].id;
+  }
+
+  /**
+   * Add a file to a message
+   */
+  public async addMessageFile(messageFile: Omit<import('./DatabaseSchema').MessageFile, 'id'>): Promise<number> {
+    if (!this.db) throw new Error('Database not initialized');
+    const { message_id, file_name, file_content, file_url, created_at } = messageFile;
+    const query = `INSERT INTO message_files (message_id, file_name, file_content, file_url, created_at) VALUES (?, ?, ?, ?, ?)`;
+    const res = await this.db.run(query, [message_id, file_name, file_content, file_url, created_at]);
+    if (res.changes?.lastId === undefined) throw new Error('Failed to get last inserted ID');
+    return res.changes.lastId;
+  }
+
+  /**
+   * Get all files for a message
+   */
+  public async getMessageFiles(messageId: number): Promise<import('./DatabaseSchema').MessageFile[]> {
+    if (!this.db) throw new Error('Database not initialized');
+    const query = `SELECT * FROM message_files WHERE message_id = ? ORDER BY created_at ASC`;
+    const res = await this.db.query(query, [messageId]);
+    return res.values ? (res.values as import('./DatabaseSchema').MessageFile[]) : [];
   }
 
   /**

@@ -6,6 +6,11 @@ import { DatabaseService } from '../services/db';
 export interface Message {
   id: string;
   content: string;
+  files?: Array<{
+    name: string;
+    content?: string;
+    url?: string;
+  }>;
   sender: 'user' | 'ai';
   timestamp: Date;
   mediaUrl?: string; // Optional media URL
@@ -127,8 +132,12 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     try {
       // Add to database
       const db = DatabaseService.getInstance();
+      
+      // Get the default user ID from database
+      const userId = await db.getDefaultUserId();
+      
       const dbConversation = {
-        user_id: 1, // TODO: Replace with actual user ID from authentication context
+        user_id: userId,
         title,
         last_message: '',
         created_at: nowISOString,
@@ -210,13 +219,26 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const db = DatabaseService.getInstance();
       const dbMessages = await db.getMessagesForConversation(parseInt(id));
       
-      // Map database messages to UI messages
-      const uiMessages = dbMessages.map(dbMsg => ({
-        id: dbMsg.id.toString(),
-        content: dbMsg.content,
-        sender: dbMsg.is_user_message === 1 ? 'user' : 'ai',
-        timestamp: new Date(dbMsg.created_at),
-        mediaUrl: dbMsg.media_url
+      // Map database messages to UI messages with files
+      const uiMessages = await Promise.all(dbMessages.map(async (dbMsg) => {
+        // Get files for this message
+        const messageFiles = await db.getMessageFiles(dbMsg.id);
+        
+        // Transform files to UI format
+        const files = messageFiles.map(dbFile => ({
+          name: dbFile.file_name,
+          content: dbFile.file_content,
+          url: dbFile.file_url
+        }));
+        
+        return {
+          id: dbMsg.id.toString(),
+          content: dbMsg.content,
+          sender: dbMsg.is_user_message === 1 ? 'user' : 'ai',
+          timestamp: new Date(dbMsg.created_at),
+          mediaUrl: dbMsg.media_url,
+          files: files.length > 0 ? files : undefined
+        };
       }));
       
       // Update the conversation with loaded messages
@@ -253,13 +275,28 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       // Add message to database
       const messageId = await db.addMessage(dbMessage);
       
-      // Create UI message object
+      // Add files to database if they exist
+      if (message.files && message.files.length > 0) {
+        for (const file of message.files) {
+          const dbFile = {
+            message_id: messageId,
+            file_name: file.name,
+            file_content: file.content,
+            file_url: file.url,
+            created_at: timestampISOString
+          };
+          await db.addMessageFile(dbFile);
+        }
+      }
+      
+      // Create UI message object with files
       const newMessage: Message = {
         id: messageId.toString(),
         content: message.content,
         sender: message.sender,
         timestamp,
-        mediaUrl: message.mediaUrl
+        mediaUrl: message.mediaUrl,
+        files: message.files
       };
       
       // Find the conversation to update
