@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import DocumentUploader from '../components/DocumentUploader';
 import { parseEventPrompt } from '../utils/parseEventPrompt';
 import { CalendarHandler } from '../services/db/CalendarHandler';
@@ -90,12 +90,24 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const upcomingEvents = [
-    { id: 1, title: 'Team Meeting', time: '10:00 AM', urgent: true },
-    { id: 2, title: 'Lunch with Sarah', time: '1:00 PM', urgent: false },
-    { id: 3, title: 'Doctor Appointment', time: '3:30 PM', urgent: true },
-  ];
 
+  const [upcomingEvents, setUpcomingEvents] = useState<CalendarEvent[]>([]);
+
+  const fetchEvents = useCallback(async () => {
+    const date = new Date();
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const formattedDate = `${yyyy}-${mm}-${dd}`;
+    console.log('Fetching events for date:', formattedDate);
+    const handler = new CalendarHandler();
+    const eventList = await handler.getEventsByDate(formattedDate);
+    setUpcomingEvents(eventList); // Save to state
+  }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
   const handleSendMessage = async () => {
     if (chatMessage.trim() || attachedFiles.length > 0) {
       // Try to save event from prompt
@@ -164,7 +176,7 @@ const Dashboard: React.FC = () => {
       // Use CalendarHandler to create the event
       const handler = new CalendarHandler();
       await handler.createEvent(event);
-
+      await fetchEvents();
       return true;
     } catch (e) {
       console.error('Event save error:', e);
@@ -433,22 +445,29 @@ const Dashboard: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.4 }}
             >
               <div className="events-simple-list">
-                {upcomingEvents.slice(0, 2).map((event, index) => (
+                {upcomingEvents.map((event, index) => (
                   <motion.div
                     key={event.id}
-                    className={`event-simple-item ${event.urgent ? 'urgent' : ''}`}
+                    className={`event-simple-item `}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
                   >
                     <div className="event-time-simple">
                       <IonIcon icon={timeOutline} />
-                      <span>{event.time}</span>
+                      <span>
+                        {new Date(event.start_time).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true,
+                        })}
+                      </span>
                     </div>
                     <span className="event-title-simple">{event.title}</span>
-                    {event.urgent && <div className="urgent-dot" />}
+                    {/* {event.urgent && <div className="urgent-dot" />} */}
                   </motion.div>
                 ))}
+
               </div>
             </motion.div>
           )}
