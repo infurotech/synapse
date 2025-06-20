@@ -25,6 +25,8 @@ import { motion } from 'framer-motion';
 import './Dashboard.css';
 import { useConversation } from '../contexts/ConversationContext';
 import RecentConversations from '../components/RecentConversations';
+import { isPlatform } from '@ionic/react';
+import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import { CalendarEvent } from '../services/db';
 
 interface Suggestion {
@@ -215,9 +217,45 @@ const Dashboard: React.FC = () => {
     setIsRecording(false); // Reset recording state when a suggestion is clicked
   };
 
-  const handleVoiceRecord = () => {
-    setIsRecording(!isRecording);
-    // Here you would implement voice recording functionality
+  const handleVoiceRecord = async () => {
+    if (!isPlatform('android') && !isPlatform('ios')) {
+      alert('Speech recognition is only available on mobile devices.');
+      return;
+    }
+
+    if (!isRecording) {
+      setIsRecording(true);
+
+      const perm = await SpeechRecognition.requestPermissions();
+      if (perm.speechRecognition !== 'granted') {
+        alert('Microphone permission is required for speech recognition.');
+        setIsRecording(false);
+        return;
+      }
+
+      try {
+        const result = await SpeechRecognition.start({
+          language: 'en-US',
+          maxResults: 1,
+          prompt: 'Speak now',
+          partialResults: false,
+          popup: false,
+        });
+
+        if (result.matches && result.matches.length > 0) {
+          setChatMessage(result.matches[0]);
+        } else {
+          alert('No speech detected. Please try again.');
+        }
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        alert('Speech recognition error: ' + errorMessage);
+      }
+      setIsRecording(false);
+    } else {
+      setIsRecording(false);
+      await SpeechRecognition.stop();
+    }
   };
 
   const handleFileUpload = (file: File, formattedContent?: string) => {
