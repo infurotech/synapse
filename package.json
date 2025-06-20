@@ -12,6 +12,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@capacitor-community/speech-recognition": "^7.0.1",
     "@awesome-cordova-plugins/android-permissions": "^8.0.2",
     "@awesome-cordova-plugins/calendar": "^8.0.2",
     "@capacitor-community/sqlite": "^7.0.0",
@@ -41,7 +42,6 @@
     "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
-    "@capacitor-community/speech-recognition": "^7.0.1",
     "@capacitor/cli": "^7.2.0",
     "@testing-library/dom": ">=7.21.4",
     "@testing-library/jest-dom": "^5.16.5",
