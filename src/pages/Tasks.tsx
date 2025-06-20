@@ -23,8 +23,7 @@ import {
 import './Tasks.css';
 
 const Tasks: React.FC = () => {
-  const [showAI, setShowAI] = useState(false);
-
+  
   return (
     <IonPage>
       <IonHeader>
