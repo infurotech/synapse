@@ -64,6 +64,7 @@ export interface Goal {
 // Conversation schema
 export interface Conversation {
   id: number;
+  user_id: number;
   title: string;
   last_message?: string;
   created_at: string;
@@ -80,6 +81,16 @@ export interface Message {
   created_at: string;
 }
 
+// Message files schema for storing multiple files per message
+export interface MessageFile {
+  id: number;
+  message_id: number;
+  file_name: string;
+  file_content?: string; // For text-based files
+  file_url?: string; // For media files
+  created_at: string;
+}
+
 // Database table names
 export enum TableName {
   USERS = 'users',
@@ -87,7 +98,8 @@ export enum TableName {
   CALENDAR_EVENTS = 'calendar_events',
   GOALS = 'goals',
   CONVERSATIONS = 'conversations',
-  MESSAGES = 'messages'
+  MESSAGES = 'messages',
+  MESSAGE_FILES = 'message_files'
 }
 
 // Database schema map
@@ -98,6 +110,7 @@ export interface DatabaseSchema {
   [TableName.GOALS]: Goal;
   [TableName.CONVERSATIONS]: Conversation;
   [TableName.MESSAGES]: Message;
+  [TableName.MESSAGE_FILES]: MessageFile;
 }
 
 // Create a namespace for all schema types

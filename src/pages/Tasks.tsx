@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   IonContent,
   IonPage,
@@ -11,15 +11,19 @@ import {
   IonCardContent,
   IonIcon,
   IonBadge,
+  IonFab,
+  IonFabButton,
 } from '@ionic/react';
 import {
   checkmarkCircleOutline,
   timeOutline,
   flagOutline,
+  chatbubbleOutline,
 } from 'ionicons/icons';
 import './Tasks.css';
 
 const Tasks: React.FC = () => {
+  
   return (
     <IonPage>
       <IonHeader>
@@ -69,7 +73,10 @@ const Tasks: React.FC = () => {
               </div>
             </IonCardContent>
           </IonCard>
+
+          {/* AI Assistant */}
         </div>
+        
       </IonContent>
     </IonPage>
   );
